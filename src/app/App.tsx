@@ -10,7 +10,6 @@ import '@fontsource/roboto/700.css'
 import AppBar from './AppBar.tsx'
 import { ThemeProvider } from '@mui/material'
 import theme from './Themes.tsx'
-import Toggler from './ToggleTheme.tsx'
 
 function App() {
 	const [count, setCount] = useState(0)
@@ -20,7 +19,6 @@ function App() {
 		<>
 			<ThemeProvider defaultMode="light" theme={theme}>
 				<AppBar />
-				<Toggler />
 				<div>
 					<a href="https://vite.dev" target="_blank">
 						<img src={viteLogo} className="logo" alt="Vite logo" />
