@@ -8,6 +8,7 @@ import '@fontsource/roboto/400.css'
 import '@fontsource/roboto/500.css'
 import '@fontsource/roboto/700.css'
 import AppBar from './AppBar.tsx'
+import IncreaseAge from './test.tsx'
 
 function App() {
 	const [count, setCount] = useState(0)
@@ -37,6 +38,7 @@ function App() {
 			</div>
 			<p className="read-the-docs">Click on the Vite and React logos to learn more</p>
 			<Button variant="contained">Hello world</Button>
+			<IncreaseAge />
 		</>
 	)
 }
