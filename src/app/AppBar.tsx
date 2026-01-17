@@ -97,7 +97,7 @@ const ButtonAppBar = () => {
 						<FlareIcon />
 					</Stack>
 					<FormControlLabel
-						control={<IOSSwitch sx={{ m: 0 }} checked={mode === 'dark'} />}
+						control={<IOSSwitch sx={{ m: 0 }} checked={mode === 'dark'}></IOSSwitch>}
 						onChange={handleToggleTheme}
 					/>
 					<Stack direction="row">
