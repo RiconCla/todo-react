@@ -13,7 +13,7 @@ const theme = createTheme({
 					main: '#1976d2',
 				},
 				secondary: {
-					main: '#080707',
+					main: '#fff',
 				},
 			},
 		},
@@ -32,7 +32,7 @@ const theme = createTheme({
 
 createRoot(document.getElementById('root')!).render(
 	<>
-		<ThemeProvider defaultMode="light" theme={theme}>
+		<ThemeProvider defaultMode="dark" theme={theme}>
 			<CssBaseline />
 			<App />
 		</ThemeProvider>
