@@ -77,7 +77,7 @@ function App() {
 										),
 									},
 								}}
-							></TextField>
+							/>
 							<TextField
 								disabled={loading ? true : false}
 								id="filled-password-input"
@@ -95,7 +95,7 @@ function App() {
 										),
 									},
 								}}
-							></TextField>
+							/>
 							<Button
 								variant="contained"
 								color="primary"
@@ -125,7 +125,7 @@ function App() {
 										),
 									},
 								}}
-							></TextField>
+							/>
 							<TextField
 								disabled={loading ? true : false}
 								id="filled-password-input"
@@ -143,7 +143,7 @@ function App() {
 										),
 									},
 								}}
-							></TextField>
+							/>
 							<Button
 								variant="contained"
 								color="primary"
