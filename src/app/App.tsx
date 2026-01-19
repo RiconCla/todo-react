@@ -64,7 +64,9 @@ function App() {
 			}
 		} catch (error) {
 			setLoading(false)
-			console.log(error.message)
+			if (error instanceof Error) {
+				console.log(error.message)
+			}
 		}
 	}
 
@@ -95,8 +97,10 @@ function App() {
 				return
 			}
 		} catch (error) {
-			console.log(error.message)
 			setLoading(false)
+			if (error instanceof Error) {
+				console.log(error.message)
+			}
 		}
 	}
 

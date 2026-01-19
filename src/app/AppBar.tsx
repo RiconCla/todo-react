@@ -13,8 +13,7 @@ type Props = {
 	username?: string
 }
 
-const ButtonAppBar = (props: Props) => {
-	const { username } = props
+const ButtonAppBar = ({ username }: Props) => {
 	const { mode, setMode } = useColorScheme()
 	if (!mode) {
 		return null
@@ -26,7 +25,7 @@ const ButtonAppBar = (props: Props) => {
 
 	const stringToColor = (string: string) => {
 		let hash = 0
-		let i
+		let i: number
 
 		for (i = 0; i < string.length; i += 1) {
 			hash = string.charCodeAt(i) + ((hash << 5) - hash)
