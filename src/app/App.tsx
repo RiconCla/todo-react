@@ -11,8 +11,10 @@ import { AccountCircle } from '@mui/icons-material'
 import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Paper from '@mui/material/Paper'
+import { jwtDecode } from 'jwt-decode'
 
 function App() {
+	const [user, setUser] = useState<{ access_token: string; username: string } | null>(null)
 	const [userName, setUserName] = useState('')
 	const [userPassword, setUserPassword] = useState('')
 	const [loading, setLoading] = useState<boolean>(false)
@@ -25,13 +27,86 @@ function App() {
 		setUserPassword(e.currentTarget.value)
 	}
 
-	const handleLogin = () => {
+	const handleLogin = async () => {
 		if (userName === '' || userPassword === '') return
-		console.log({ userName, userPassword })
 		setLoading(true)
-		setTimeout(() => {
+
+		try {
+			const loginResponse = await fetch('https://todos-be.vercel.app/auth/login', {
+				method: 'POST',
+				body: JSON.stringify({ username: userName, password: userPassword }),
+				mode: 'cors',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			})
+
+			if (loginResponse.status === 200) {
+				const loginData = (await loginResponse.json()) as { access_token: string; username: string }
+				const accessToken = loginData.access_token
+				console.log(jwtDecode(accessToken))
+				localStorage.setItem('access_token', accessToken)
+				setLoading(false)
+				setUser(loginData)
+				return
+			}
+
+			if (loginResponse.status === 401) {
+				alert(`Invalid username or password`)
+				setLoading(false)
+				return
+			}
+
+			if (!loginResponse.ok) {
+				alert(`Something went wrong ${loginResponse.status}`)
+				setLoading(false)
+				return
+			}
+		} catch (error) {
 			setLoading(false)
-		}, 2000)
+			if (error instanceof Error) {
+				console.log(error.message)
+			}
+		}
+	}
+
+	const handleRegister = async () => {
+		if (userName === '' || userPassword === '') return
+		setLoading(true)
+
+		try {
+			const registerResponce = await fetch('https://todos-be.vercel.app/auth/register', {
+				method: 'POST',
+				body: JSON.stringify({ username: userName, password: userPassword }),
+				mode: 'cors',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+			})
+
+			if (registerResponce.status === 201) {
+				const registerData = (await registerResponce.json()) as { _id: string; username: string }
+				console.log(registerData)
+				await handleLogin()
+				setLoading(false)
+			}
+
+			if (registerResponce.status === 409) {
+				alert(`User already exists`)
+				setLoading(false)
+				return
+			}
+		} catch (error) {
+			setLoading(false)
+			if (error instanceof Error) {
+				console.log(error.message)
+			}
+		}
+	}
+
+	const handleResetFields = () => {
+		setUserName('')
+		setUserPassword('')
 	}
 
 	const handleChange = (_event: React.MouseEvent<HTMLElement>, newAlignment: string) => {
@@ -40,7 +115,7 @@ function App() {
 
 	return (
 		<>
-			<AppBar />
+			<AppBar username={user?.username} />
 			<div style={{ marginTop: '100px' }}></div>
 
 			<Container maxWidth={'sm'}>
@@ -144,10 +219,13 @@ function App() {
 									},
 								}}
 							/>
+							<Button variant="contained" color="primary" fullWidth onClick={handleResetFields}>
+								Reset fields
+							</Button>
 							<Button
 								variant="contained"
 								color="primary"
-								onClick={handleLogin}
+								onClick={handleRegister}
 								fullWidth
 								loadingPosition="start"
 								loading={loading}
