@@ -11,9 +11,10 @@ import Brightness4Icon from '@mui/icons-material/Brightness4'
 type Props = {
 	access_token?: string
 	username?: string
+	onLogOut: () => void
 }
 
-const ButtonAppBar = ({ username }: Props) => {
+const ButtonAppBar = ({ username, onLogOut }: Props) => {
 	const { mode, setMode } = useColorScheme()
 	if (!mode) {
 		return null
@@ -133,9 +134,14 @@ const ButtonAppBar = ({ username }: Props) => {
 						<Brightness4Icon style={{ marginRight: '10px' }} />
 					</Stack>
 					{username ? (
-						<Tooltip title="User">
-							<Avatar src={''} alt={username} {...stringAvatar(username)} />
-						</Tooltip>
+						<Stack direction="row">
+							<Button sx={{ marginRight: '10px' }} color="inherit" onClick={onLogOut}>
+								Logout
+							</Button>
+							<Tooltip title="User">
+								<Avatar src={''} alt={username} {...stringAvatar(username)} />
+							</Tooltip>
+						</Stack>
 					) : (
 						<Button color="inherit">Login</Button>
 					)}
