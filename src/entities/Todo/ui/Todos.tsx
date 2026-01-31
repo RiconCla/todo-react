@@ -1,11 +1,17 @@
-import { Card, CardActions, CardContent, Checkbox, Stack, TextField, Typography } from '@mui/material'
+import {
+	Card,
+	CardActions,
+	CardContent,
+	Checkbox,
+	ClickAwayListener,
+	Stack,
+	TextField,
+	Typography,
+} from '@mui/material'
 import type { TodoType } from '../model/todoType.ts'
 import { mockTodos } from '../model/mockTodos.ts'
 import { useState, type SetStateAction } from 'react'
 import { format } from 'date-fns'
-import EditIcon from '@mui/icons-material/Edit'
-import DoneIcon from '@mui/icons-material/Done'
-import TextareaAutosize from '@mui/material/TextareaAutosize'
 import { useSnackbar } from 'notistack'
 
 type TodoProps = {
@@ -33,7 +39,7 @@ const Todo = ({ todo, setTodo }: TodoProps) => {
 	const [editTitle, setEditTitle] = useState<string>(todo.title)
 	const [editDescription, setEditDescription] = useState<string>(todo.description)
 
-	const handleEditTitle = () => {
+	const handleEdit = () => {
 		setEditing(true)
 	}
 
@@ -46,42 +52,44 @@ const Todo = ({ todo, setTodo }: TodoProps) => {
 	}
 
 	const handleSave = () => {
-		setEditing(false)
-		if (!editTitle) {
-			setTodo({ ...todo, title: todo.title, description: editDescription, updatedAt: new Date().toISOString() })
+		const trimmedTitle = editTitle.trim()
+		const trimmedDescription = editDescription.trim()
+		if (trimmedTitle === '') {
+			setTodo({ ...todo, title: todo.title, description: trimmedDescription, updatedAt: new Date().toISOString() })
+			setEditTitle(todo.title)
 			enqueueSnackbar(`The card was saved with the previous name because a card cannot be saved without a name`, {
 				variant: 'warning',
 			})
+			setEditing(false)
 			return
 		}
-		setTodo({ ...todo, title: editTitle, description: editDescription, updatedAt: new Date().toISOString() })
+		setTodo({ ...todo, title: trimmedTitle, description: trimmedDescription, updatedAt: new Date().toISOString() })
 		enqueueSnackbar(`Card: ${todo.title} saved successfully`, { variant: 'success' })
+		setEditing(false)
 	}
 
 	return (
 		<Card variant={'outlined'} sx={{ width: 250 }}>
 			<CardContent>
 				{isEditing ? (
-					<Stack direction={'column'} spacing={1}>
-						<DoneIcon fontSize={'small'} sx={{ cursor: 'pointer', alignSelf: 'flex-end' }} onClick={handleSave} />
-						<TextField style={{ width: 180 }} value={editTitle} onChange={handleSetTitle} size={'small'}></TextField>
-						<TextareaAutosize
-							style={{ width: 180, backgroundColor: '#90caf9' }}
-							value={editDescription}
-							onChange={handleSetDescription}
-						></TextareaAutosize>
-					</Stack>
+					<ClickAwayListener onClickAway={handleSave}>
+						<Stack direction={'column'} spacing={1}>
+							<TextField value={editTitle} onChange={handleSetTitle} size={'small'} />
+							<TextField maxRows={2} value={editDescription} onChange={handleSetDescription} />
+						</Stack>
+					</ClickAwayListener>
 				) : (
 					<Stack display={'flex'} direction={'column'} spacing={1}>
-						<EditIcon
-							fontSize={'small'}
-							onClick={isEditing ? undefined : handleEditTitle}
-							sx={{ cursor: 'pointer', alignSelf: 'flex-end' }}
-						/>
-						<Typography gutterBottom sx={{ color: 'text.secondary', fontSize: 14 }}>
+						<Typography
+							onDoubleClick={isEditing ? undefined : handleEdit}
+							gutterBottom
+							sx={{ color: 'text.secondary', fontSize: 14 }}
+						>
 							{todo.title}
 						</Typography>
-						<Typography variant="body2">{todo.description}</Typography>
+						<Typography onDoubleClick={isEditing ? undefined : handleEdit} variant="body2">
+							{todo.description}
+						</Typography>
 					</Stack>
 				)}
 
