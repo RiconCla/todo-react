@@ -9,12 +9,12 @@ import {
 	ToggleButton,
 	ToggleButtonGroup,
 } from '@mui/material'
-import { jwtDecode } from 'jwt-decode'
 import { AccountCircle } from '@mui/icons-material'
 import type { UserType } from '../model/userType.ts'
 import { rootApi } from '../../../shared/api/rootApi.ts'
 import { useSnackbar } from 'notistack'
 import type { AxiosError } from 'axios'
+import { handleLogin } from '../api/userApi.ts'
 
 type AuthProps = {
 	setUser: Dispatch<SetStateAction<UserType | null>>
@@ -35,31 +35,6 @@ const Auth = ({ setUser }: AuthProps) => {
 		setUserPassword(e.currentTarget.value)
 	}
 
-	const handleLogin = async () => {
-		if (userName === '' || userPassword === '') return
-		setLoading(true)
-
-		try {
-			const loginData = await rootApi.post<UserType>('/auth/login', {
-				username: userName,
-				password: userPassword,
-			})
-
-			const accessToken = loginData.data.access_token
-			console.warn(jwtDecode(accessToken))
-			localStorage.setItem('access_token', accessToken)
-			setLoading(false)
-			enqueueSnackbar(`Welcome, ${loginData.data.username} !`, { variant: 'success' })
-			setUser(loginData.data)
-			return
-		} catch (error) {
-			const axiosError = error as AxiosError<{ message: string }>
-			enqueueSnackbar(axiosError.response?.data.message || 'Unknown error', { variant: 'error' })
-		} finally {
-			setLoading(false)
-		}
-	}
-
 	const handleRegister = async () => {
 		if (userName === '' || userPassword === '') return
 		setLoading(true)
@@ -71,7 +46,8 @@ const Auth = ({ setUser }: AuthProps) => {
 			})
 
 			enqueueSnackbar(`Registration successful!`, { variant: 'success' })
-			await handleLogin()
+			const user = await handleLogin(userName, userPassword)
+			setUser(user)
 		} catch (error) {
 			setLoading(false)
 			const axiosError = error as AxiosError<{ message: string }>
@@ -147,7 +123,7 @@ const Auth = ({ setUser }: AuthProps) => {
 						<Button
 							variant="contained"
 							color="primary"
-							onClick={handleLogin}
+							onClick={() => handleLogin(userName, userPassword)}
 							fullWidth
 							loadingPosition="start"
 							loading={loading}

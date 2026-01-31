@@ -30,18 +30,18 @@ const Todo = ({ todo, setTodo }: TodoProps) => {
 	const { enqueueSnackbar } = useSnackbar()
 
 	const [isEditing, setEditing] = useState<boolean>(false)
-	const [editTitle, setEditTitle] = useState<string | number>(todo.title)
+	const [editTitle, setEditTitle] = useState<string>(todo.title)
 	const [editDescription, setEditDescription] = useState<string>(todo.description)
 
 	const handleEditTitle = () => {
 		setEditing(true)
 	}
 
-	const handleSetTitle = (event: { target: { value: SetStateAction<string | number> } }) => {
+	const handleSetTitle = (event: { target: { value: SetStateAction<string> } }) => {
 		setEditTitle(event?.target.value)
 	}
 
-	const handleSetDescription = (event: { target: { value: SetStateAction<string | number> } }) => {
+	const handleSetDescription = (event: { target: { value: SetStateAction<string> } }) => {
 		setEditDescription(event?.target.value)
 	}
 
@@ -108,13 +108,13 @@ const Todo = ({ todo, setTodo }: TodoProps) => {
 const Todos = () => {
 	const [todos, setTodos] = useState<TodoType[]>(mockTodos)
 
-	const setTodo = (todo: TodoType) => {
+	const setTodo = (updateTodo: TodoType) => {
 		setTodos((prev) =>
-			prev.map((item) => {
-				if (item._id === todo._id) {
-					return todo
+			prev.map((oldTodo) => {
+				if (oldTodo._id === updateTodo._id) {
+					return updateTodo
 				}
-				return item
+				return oldTodo
 			})
 		)
 	}
