@@ -30,13 +30,6 @@ const Auth = ({ setUser }: AuthProps) => {
 		setUserPassword(e.currentTarget.value)
 	}
 
-	// const handleLoadingChange = (loading: boolean): void => {
-	// 	if (!loading) {
-	// 		setLoading(false)
-	// 	}
-	// 	setLoading(true)
-	// }
-
 	const handleResetFields = () => {
 		setUserName('')
 		setUserPassword('')
