@@ -11,10 +11,7 @@ import {
 } from '@mui/material'
 import { AccountCircle } from '@mui/icons-material'
 import type { UserType } from '../model/userType.ts'
-import { rootApi } from '../../../shared/api/rootApi.ts'
-import { useSnackbar } from 'notistack'
-import type { AxiosError } from 'axios'
-import { handleLogin } from '../api/userApi.ts'
+import { handleLogin, handleRegister } from '../api/userApi.ts'
 
 type AuthProps = {
 	setUser: Dispatch<SetStateAction<UserType | null>>
@@ -26,8 +23,6 @@ const Auth = ({ setUser }: AuthProps) => {
 	const [loading, setLoading] = useState<boolean>(false)
 	const [isLoginFormName, setLoginFormName] = useState('login')
 
-	const { enqueueSnackbar } = useSnackbar()
-
 	const handleUserNameChange = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
 		setUserName(e.currentTarget.value)
 	}
@@ -35,27 +30,12 @@ const Auth = ({ setUser }: AuthProps) => {
 		setUserPassword(e.currentTarget.value)
 	}
 
-	const handleRegister = async () => {
-		if (userName === '' || userPassword === '') return
-		setLoading(true)
-
-		try {
-			await rootApi.post<UserType>('/auth/register', {
-				username: userName,
-				password: userPassword,
-			})
-
-			enqueueSnackbar(`Registration successful!`, { variant: 'success' })
-			const user = await handleLogin(userName, userPassword)
-			setUser(user)
-		} catch (error) {
-			setLoading(false)
-			const axiosError = error as AxiosError<{ message: string }>
-			enqueueSnackbar(axiosError.response?.data.message || 'Unknown error', { variant: 'error' })
-		} finally {
-			setLoading(false)
-		}
-	}
+	// const handleLoadingChange = (loading: boolean): void => {
+	// 	if (!loading) {
+	// 		setLoading(false)
+	// 	}
+	// 	setLoading(true)
+	// }
 
 	const handleResetFields = () => {
 		setUserName('')
@@ -123,7 +103,7 @@ const Auth = ({ setUser }: AuthProps) => {
 						<Button
 							variant="contained"
 							color="primary"
-							onClick={() => handleLogin(userName, userPassword)}
+							onClick={() => handleLogin(setLoading, setUser, userName, userPassword)}
 							fullWidth
 							loadingPosition="start"
 							loading={loading}
@@ -174,7 +154,7 @@ const Auth = ({ setUser }: AuthProps) => {
 						<Button
 							variant="contained"
 							color="primary"
-							onClick={handleRegister}
+							onClick={() => handleRegister(setLoading, setUser, userName, userPassword)}
 							fullWidth
 							loadingPosition="start"
 							loading={loading}

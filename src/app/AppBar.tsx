@@ -7,6 +7,7 @@ import { useColorScheme } from '@mui/material/styles'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import FlareIcon from '@mui/icons-material/Flare'
 import Brightness4Icon from '@mui/icons-material/Brightness4'
+import { type SyntheticEvent } from 'react'
 
 type Props = {
 	access_token?: string
@@ -20,7 +21,7 @@ const ButtonAppBar = ({ username, onLogOut }: Props) => {
 		return null
 	}
 
-	const handleToggleTheme = (_event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+	const handleToggleTheme = (_event: SyntheticEvent<Element, Event>, checked: boolean) => {
 		setMode(checked ? 'dark' : 'light')
 	}
 
@@ -129,6 +130,7 @@ const ButtonAppBar = ({ username, onLogOut }: Props) => {
 					<FormControlLabel
 						control={<IOSSwitch sx={{ m: 0 }} checked={mode === 'dark'} />}
 						onChange={handleToggleTheme}
+						label={undefined}
 					/>
 					<Stack direction="row">
 						<Brightness4Icon style={{ marginRight: '10px' }} />
