@@ -54,7 +54,7 @@ const Todo = ({ todo, setTodo }: TodoProps) => {
 	const handleSave = () => {
 		const trimmedTitle = editTitle.trim()
 		const trimmedDescription = editDescription.trim()
-		if (trimmedTitle === '') {
+		if (!trimmedTitle) {
 			setTodo({ ...todo, title: todo.title, description: trimmedDescription, updatedAt: new Date().toISOString() })
 			setEditTitle(todo.title)
 			enqueueSnackbar(`The card was saved with the previous name because a card cannot be saved without a name`, {

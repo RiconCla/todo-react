@@ -21,8 +21,7 @@ function App() {
 
 	return (
 		<>
-			<AppBar username={user?.username} onLogOut={logOut} /> // не понимаю почему logOut нужно обернуть в onLogOut,
-			почему нельзя сразу передать logOut, как одноименный тип в AppBar
+			<AppBar username={user?.username} onLogOut={logOut} />
 			<div style={{ marginTop: '100px' }}></div>
 			{user ? <Todos /> : <Auth setUser={setUser} />}
 		</>

@@ -38,7 +38,7 @@ export const handleRegister = async (
 	userName: string,
 	userPassword: string
 ) => {
-	if (userName === '' || userPassword === '') return
+	if (!userName || !userPassword) return
 	setLoading(true)
 
 	try {
