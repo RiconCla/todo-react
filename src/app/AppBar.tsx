@@ -7,19 +7,21 @@ import { useColorScheme } from '@mui/material/styles'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import FlareIcon from '@mui/icons-material/Flare'
 import Brightness4Icon from '@mui/icons-material/Brightness4'
+import { type SyntheticEvent } from 'react'
 
 type Props = {
 	access_token?: string
 	username?: string
+	onLogOut: () => void
 }
 
-const ButtonAppBar = ({ username }: Props) => {
+const ButtonAppBar = ({ username, onLogOut }: Props) => {
 	const { mode, setMode } = useColorScheme()
 	if (!mode) {
 		return null
 	}
 
-	const handleToggleTheme = (_event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+	const handleToggleTheme = (_event: SyntheticEvent<Element, Event>, checked: boolean) => {
 		setMode(checked ? 'dark' : 'light')
 	}
 
@@ -128,14 +130,20 @@ const ButtonAppBar = ({ username }: Props) => {
 					<FormControlLabel
 						control={<IOSSwitch sx={{ m: 0 }} checked={mode === 'dark'} />}
 						onChange={handleToggleTheme}
+						label={undefined}
 					/>
 					<Stack direction="row">
 						<Brightness4Icon style={{ marginRight: '10px' }} />
 					</Stack>
 					{username ? (
-						<Tooltip title="User">
-							<Avatar src={''} alt={username} {...stringAvatar(username)} />
-						</Tooltip>
+						<Stack direction="row">
+							<Button sx={{ marginRight: '10px' }} color="inherit" onClick={onLogOut}>
+								Logout
+							</Button>
+							<Tooltip title="User">
+								<Avatar src={''} alt={username} {...stringAvatar(username)} />
+							</Tooltip>
+						</Stack>
 					) : (
 						<Button color="inherit">Login</Button>
 					)}
