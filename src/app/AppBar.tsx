@@ -8,6 +8,7 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import FlareIcon from '@mui/icons-material/Flare'
 import Brightness4Icon from '@mui/icons-material/Brightness4'
 import { type SyntheticEvent } from 'react'
+import { useTodosStore } from '../entities/Todo/model/store/useTodosStore.ts'
 
 type Props = {
 	access_token?: string
@@ -17,6 +18,8 @@ type Props = {
 
 const ButtonAppBar = ({ username, onLogOut }: Props) => {
 	const { mode, setMode } = useColorScheme()
+	const todos = useTodosStore((state) => state.todos)
+	const undoneTodos = todos.filter((item) => !item.completed)
 	if (!mode) {
 		return null
 	}
@@ -117,7 +120,7 @@ const ButtonAppBar = ({ username, onLogOut }: Props) => {
 					<Stack direction={'row'} spacing={2} style={{ flexGrow: 1 }}>
 						{username && (
 							<Typography variant="h6" component="div">
-								Todos
+								Todos{' ' + undoneTodos.length}
 							</Typography>
 						)}
 						<Typography variant="h6" component="div">
