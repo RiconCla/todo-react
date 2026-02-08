@@ -6,14 +6,13 @@ import Button from '@mui/material/Button'
 import type { TodoType } from '../model/todoType.ts'
 
 const Todos = () => {
-	// const [todos, setTodos] = useState<TodoType[]>(mockTodos)
 	const [newTodoTitle, setNewTodoTitle] = useState<string>('')
 	const [newTodoDescription, setNewTodoDescription] = useState<string>('')
 	const todos = useTodosStore((state) => state.todos)
 	const setTodos = useTodosStore((state) => state.setTodos)
 	const addTodos = useTodosStore((state) => state.addTodo)
 
-	const setTodoCompeted = (todo: TodoType) => {
+	const setTodoCompleted = (todo: TodoType) => {
 		const updatedTodos = todos.map((t) => {
 			if (t._id === todo._id) {
 				return todo
@@ -27,7 +26,7 @@ const Todos = () => {
 		setNewTodoTitle(e.target.value)
 	}
 
-	const handleDecriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setNewTodoDescription(e.target.value)
 	}
 
@@ -49,13 +48,13 @@ const Todos = () => {
 	return (
 		<Container>
 			<Input placeholder={'title'} value={newTodoTitle} onChange={handleTitleChange} />
-			<Input placeholder={'description'} value={newTodoDescription} onChange={handleDecriptionChange} />
+			<Input placeholder={'description'} value={newTodoDescription} onChange={handleDescriptionChange} />
 			<Button variant="contained" disabled={!newTodoTitle} onClick={handleAddTodo}>
 				ЖМИ
 			</Button>
 			<Stack flexWrap={'wrap'} spacing={2} direction={'row'} gap={2}>
 				{todos.map((todo) => {
-					return <Todo todo={todo} key={todo._id} setTodo={setTodoCompeted} />
+					return <Todo todo={todo} key={todo._id} setTodo={setTodoCompleted} />
 				})}
 			</Stack>
 		</Container>

@@ -12,11 +12,13 @@ import {
 	TextField,
 	Typography,
 } from '@mui/material'
+import DeleteIcon from '@mui/icons-material/Delete'
 
 type TodoProps = {
 	todo: TodoType
-	setTodo?: (todo: TodoType) => void
+	setTodo: (todo: TodoType) => void
 }
+
 const formatDate = (dateString: string | Date) => {
 	const date = new Date(dateString)
 
@@ -27,7 +29,7 @@ const formatDate = (dateString: string | Date) => {
 }
 export const Todo = ({ todo, setTodo }: TodoProps) => {
 	const handleClick = () => {
-		setTodo?.({ ...todo, completed: !todo.completed })
+		setTodo({ ...todo, completed: !todo.completed })
 	}
 
 	const { enqueueSnackbar } = useSnackbar()
@@ -52,7 +54,7 @@ export const Todo = ({ todo, setTodo }: TodoProps) => {
 		const trimmedTitle = editTitle.trim()
 		const trimmedDescription = editDescription.trim()
 		if (!trimmedTitle) {
-			setTodo?.({ ...todo, title: todo.title, description: trimmedDescription, updatedAt: new Date().toISOString() })
+			setTodo({ ...todo, title: todo.title, description: trimmedDescription, updatedAt: new Date().toISOString() })
 			setEditTitle(todo.title)
 			enqueueSnackbar(`The card was saved with the previous name because a card cannot be saved without a name`, {
 				variant: 'warning',
@@ -60,7 +62,7 @@ export const Todo = ({ todo, setTodo }: TodoProps) => {
 			setEditing(false)
 			return
 		}
-		setTodo?.({ ...todo, title: trimmedTitle, description: trimmedDescription, updatedAt: new Date().toISOString() })
+		setTodo({ ...todo, title: trimmedTitle, description: trimmedDescription, updatedAt: new Date().toISOString() })
 		enqueueSnackbar(`Card: ${todo.title} saved successfully`, { variant: 'success' })
 		setEditing(false)
 	}
@@ -103,8 +105,9 @@ export const Todo = ({ todo, setTodo }: TodoProps) => {
 					</Typography>
 				</Typography>
 			</CardContent>
-			<CardActions>
+			<CardActions sx={{ display: 'flex', justifyContent: 'space-between' }}>
 				<Checkbox checked={todo.completed} onClick={handleClick} />
+				<DeleteIcon />
 			</CardActions>
 		</Card>
 	)
