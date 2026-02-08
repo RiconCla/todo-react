@@ -17,6 +17,7 @@ import DeleteIcon from '@mui/icons-material/Delete'
 type TodoProps = {
 	todo: TodoType
 	setTodo: (todo: TodoType) => void
+	deleteTodo: (id: string) => boolean
 }
 
 const formatDate = (dateString: string | Date) => {
@@ -27,7 +28,7 @@ const formatDate = (dateString: string | Date) => {
 
 	return `${time}\n${datePart}`
 }
-export const Todo = ({ todo, setTodo }: TodoProps) => {
+export const Todo = ({ todo, setTodo, deleteTodo }: TodoProps) => {
 	const handleClick = () => {
 		setTodo({ ...todo, completed: !todo.completed })
 	}
@@ -65,6 +66,15 @@ export const Todo = ({ todo, setTodo }: TodoProps) => {
 		setTodo({ ...todo, title: trimmedTitle, description: trimmedDescription, updatedAt: new Date().toISOString() })
 		enqueueSnackbar(`Card: ${todo.title} saved successfully`, { variant: 'success' })
 		setEditing(false)
+	}
+
+	const handleDelete = (result: boolean) => {
+		if (!result) {
+			enqueueSnackbar(`Delete failed. Element not found.`, { variant: 'error' })
+			return
+		}
+		deleteTodo(todo._id)
+		enqueueSnackbar(`Card: ${todo.title} - deleted`, { variant: 'success' })
 	}
 
 	return (
@@ -107,7 +117,7 @@ export const Todo = ({ todo, setTodo }: TodoProps) => {
 			</CardContent>
 			<CardActions sx={{ display: 'flex', justifyContent: 'space-between' }}>
 				<Checkbox checked={todo.completed} onClick={handleClick} />
-				<DeleteIcon />
+				<DeleteIcon onClick={handleDelete} sx={{ cursor: 'pointer' }} />
 			</CardActions>
 		</Card>
 	)
