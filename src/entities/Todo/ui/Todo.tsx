@@ -68,12 +68,13 @@ export const Todo = ({ todo, setTodo, deleteTodo }: TodoProps) => {
 		setEditing(false)
 	}
 
-	const handleDelete = (result: boolean) => {
+	const handleDelete = () => {
+		const result = deleteTodo(todo._id)
 		if (!result) {
 			enqueueSnackbar(`Delete failed. Element not found.`, { variant: 'error' })
 			return
 		}
-		deleteTodo(todo._id)
+
 		enqueueSnackbar(`Card: ${todo.title} - deleted`, { variant: 'success' })
 	}
 
@@ -117,7 +118,7 @@ export const Todo = ({ todo, setTodo, deleteTodo }: TodoProps) => {
 			</CardContent>
 			<CardActions sx={{ display: 'flex', justifyContent: 'space-between' }}>
 				<Checkbox checked={todo.completed} onClick={handleClick} />
-				<DeleteIcon onClick={handleDelete} sx={{ cursor: 'pointer' }} />
+				<DeleteIcon sx={{ cursor: 'pointer' }} onClick={handleDelete} />
 			</CardActions>
 		</Card>
 	)

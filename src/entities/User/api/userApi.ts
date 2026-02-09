@@ -7,7 +7,7 @@ import type { Dispatch, SetStateAction } from 'react'
 
 export const handleLogin = async (
 	setLoading: Dispatch<SetStateAction<boolean>>,
-	setUser: Dispatch<SetStateAction<UserType | null>>,
+	setUser: (user: UserType | null) => void,
 	userName: string,
 	userPassword: string
 ) => {
@@ -34,7 +34,7 @@ export const handleLogin = async (
 
 export const handleRegister = async (
 	setLoading: Dispatch<SetStateAction<boolean>>,
-	setUser: Dispatch<SetStateAction<UserType | null>>,
+	setUser: (user: UserType | null) => void,
 	userName: string,
 	userPassword: string
 ) => {

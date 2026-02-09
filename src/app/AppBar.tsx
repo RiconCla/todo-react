@@ -9,19 +9,34 @@ import FlareIcon from '@mui/icons-material/Flare'
 import Brightness4Icon from '@mui/icons-material/Brightness4'
 import { type SyntheticEvent } from 'react'
 import { useTodosStore } from '../entities/Todo/model/store/useTodosStore.ts'
+import { useUserStore } from '../entities/User/model/store/useUserStore.ts'
+import { autoLogin } from '../shared/util/autoLogin.ts'
 
 type Props = {
 	access_token?: string
 	username?: string
-	onLogOut: () => void
 }
 
-const ButtonAppBar = ({ username, onLogOut }: Props) => {
+const ButtonAppBar = ({ username }: Props) => {
 	const { mode, setMode } = useColorScheme()
 	const todos = useTodosStore((state) => state.todos)
+	const user = useUserStore((state) => state.user)
+	const clearUser = useUserStore((state) => state.clearUser)
+	const setUser = useUserStore((state) => state.setUser)
+
 	const undoneTodos = todos.filter((item) => !item.completed)
 	if (!mode) {
 		return null
+	}
+
+	if (!user) {
+		const loggedUser = autoLogin()
+		setUser(loggedUser)
+	}
+
+	const logOut = () => {
+		localStorage.removeItem('access_token')
+		clearUser()
 	}
 
 	const handleToggleTheme = (_event: SyntheticEvent<Element, Event>, checked: boolean) => {
@@ -140,7 +155,7 @@ const ButtonAppBar = ({ username, onLogOut }: Props) => {
 					</Stack>
 					{username ? (
 						<Stack direction="row">
-							<Button sx={{ marginRight: '10px' }} color="inherit" onClick={onLogOut}>
+							<Button sx={{ marginRight: '10px' }} color="inherit" onClick={logOut}>
 								Logout
 							</Button>
 							<Tooltip title="User">
