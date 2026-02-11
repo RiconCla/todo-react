@@ -1,4 +1,4 @@
-import React, { type Dispatch, type SetStateAction, type SyntheticEvent, useState } from 'react'
+import React, { type SyntheticEvent, useState } from 'react'
 import {
 	Button,
 	Container,
@@ -10,18 +10,15 @@ import {
 	ToggleButtonGroup,
 } from '@mui/material'
 import { AccountCircle } from '@mui/icons-material'
-import type { UserType } from '../model/userType.ts'
 import { handleLogin, handleRegister } from '../api/userApi.ts'
+import { useUserStore } from '../model/store/useUserStore.ts'
 
-type AuthProps = {
-	setUser: Dispatch<SetStateAction<UserType | null>>
-}
-
-const Auth = ({ setUser }: AuthProps) => {
+const Auth = () => {
 	const [userName, setUserName] = useState('')
 	const [userPassword, setUserPassword] = useState('')
 	const [loading, setLoading] = useState<boolean>(false)
 	const [isLoginFormName, setLoginFormName] = useState('login')
+	const setUser = useUserStore((state) => state.setUser)
 
 	const handleUserNameChange = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
 		setUserName(e.currentTarget.value)
