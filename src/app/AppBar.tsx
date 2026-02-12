@@ -8,17 +8,19 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import FlareIcon from '@mui/icons-material/Flare'
 import Brightness4Icon from '@mui/icons-material/Brightness4'
 import { type SyntheticEvent } from 'react'
+import { useUserStore } from '../entities/User/model/provider/UserContex.tsx'
 
-type Props = {
-	access_token?: string
-	username?: string
-	onLogOut: () => void
-}
-
-const ButtonAppBar = ({ username, onLogOut }: Props) => {
+const ButtonAppBar = () => {
 	const { mode, setMode } = useColorScheme()
+	const { user, setUser } = useUserStore()
+
 	if (!mode) {
 		return null
+	}
+
+	const logOut = () => {
+		localStorage.removeItem('access_token')
+		setUser(undefined)
 	}
 
 	const handleToggleTheme = (_event: SyntheticEvent<Element, Event>, checked: boolean) => {
@@ -115,7 +117,7 @@ const ButtonAppBar = ({ username, onLogOut }: Props) => {
 						<MenuIcon />
 					</IconButton>
 					<Stack direction={'row'} spacing={2} style={{ flexGrow: 1 }}>
-						{username && (
+						{user && (
 							<Typography variant="h6" component="div">
 								Todos
 							</Typography>
@@ -135,13 +137,13 @@ const ButtonAppBar = ({ username, onLogOut }: Props) => {
 					<Stack direction="row">
 						<Brightness4Icon style={{ marginRight: '10px' }} />
 					</Stack>
-					{username ? (
+					{user ? (
 						<Stack direction="row">
-							<Button sx={{ marginRight: '10px' }} color="inherit" onClick={onLogOut}>
+							<Button sx={{ marginRight: '10px' }} color="inherit" onClick={logOut}>
 								Logout
 							</Button>
 							<Tooltip title="User">
-								<Avatar src={''} alt={username} {...stringAvatar(username)} />
+								<Avatar src={''} alt={user.username} {...stringAvatar(user.username)} />
 							</Tooltip>
 						</Stack>
 					) : (

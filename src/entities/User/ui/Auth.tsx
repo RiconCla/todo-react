@@ -1,4 +1,4 @@
-import React, { type Dispatch, type SetStateAction, type SyntheticEvent, useState } from 'react'
+import React, { type SyntheticEvent, useState } from 'react'
 import {
 	Button,
 	Container,
@@ -10,14 +10,11 @@ import {
 	ToggleButtonGroup,
 } from '@mui/material'
 import { AccountCircle } from '@mui/icons-material'
-import type { UserType } from '../model/userType.ts'
 import { handleLogin, handleRegister } from '../api/userApi.ts'
+import { useUserStore } from '../model/provider/UserContex.tsx'
 
-type AuthProps = {
-	setUser: Dispatch<SetStateAction<UserType | null>>
-}
-
-const Auth = ({ setUser }: AuthProps) => {
+const Auth = () => {
+	const { setUser } = useUserStore()
 	const [userName, setUserName] = useState('')
 	const [userPassword, setUserPassword] = useState('')
 	const [loading, setLoading] = useState<boolean>(false)
