@@ -11,14 +11,18 @@ import {
 } from '@mui/material'
 import { AccountCircle } from '@mui/icons-material'
 import { handleLogin, handleRegister } from '../api/userApi.ts'
-import { useUserStore } from '../model/store/useUserStore.ts'
+import { useAppDispatch } from '../../../app/store.ts'
+import { useSelector } from 'react-redux'
+import { selectLoading } from '../model/store/userStore.ts'
 
 const Auth = () => {
 	const [userName, setUserName] = useState('')
 	const [userPassword, setUserPassword] = useState('')
-	const [loading, setLoading] = useState<boolean>(false)
+	// const [loading, setLoading] = useState<boolean>(false)
 	const [isLoginFormName, setLoginFormName] = useState('login')
-	const setUser = useUserStore((state) => state.setUser)
+	// const setUser = userStore((state) => state.setUser)
+	const dispatch = useAppDispatch()
+	const loading = useSelector(selectLoading)
 
 	const handleUserNameChange = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
 		setUserName(e.currentTarget.value)
@@ -93,7 +97,7 @@ const Auth = () => {
 						<Button
 							variant="contained"
 							color="primary"
-							onClick={() => handleLogin(setLoading, setUser, userName, userPassword)}
+							onClick={() => handleLogin(dispatch, userName, userPassword)}
 							fullWidth
 							loadingPosition="start"
 							loading={loading}
@@ -144,7 +148,7 @@ const Auth = () => {
 						<Button
 							variant="contained"
 							color="primary"
-							onClick={() => handleRegister(setLoading, setUser, userName, userPassword)}
+							onClick={() => handleRegister(dispatch, userName, userPassword)}
 							fullWidth
 							loadingPosition="start"
 							loading={loading}

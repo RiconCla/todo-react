@@ -9,8 +9,9 @@ import FlareIcon from '@mui/icons-material/Flare'
 import Brightness4Icon from '@mui/icons-material/Brightness4'
 import { type SyntheticEvent } from 'react'
 import { useTodosStore } from '../entities/Todo/model/store/useTodosStore.ts'
-import { useUserStore } from '../entities/User/model/store/useUserStore.ts'
+import { removerUser, selectUser, setUser } from '../entities/User/model/store/userStore.ts'
 import { autoLogin } from '../shared/util/autoLogin.ts'
+import { useDispatch, useSelector } from 'react-redux'
 
 type Props = {
 	access_token?: string
@@ -20,9 +21,13 @@ type Props = {
 const ButtonAppBar = ({ username }: Props) => {
 	const { mode, setMode } = useColorScheme()
 	const todos = useTodosStore((state) => state.todos)
-	const user = useUserStore((state) => state.user)
-	const clearUser = useUserStore((state) => state.clearUser)
-	const setUser = useUserStore((state) => state.setUser)
+
+	const user = useSelector(selectUser)
+	const dispatch = useDispatch()
+
+	console.log('appbar', user)
+
+	// const setUser = userStore((state) => state.setUser)
 
 	const undoneTodos = todos.filter((item) => !item.completed)
 	if (!mode) {
@@ -36,7 +41,7 @@ const ButtonAppBar = ({ username }: Props) => {
 
 	const logOut = () => {
 		localStorage.removeItem('access_token')
-		clearUser()
+		dispatch(removerUser())
 	}
 
 	const handleToggleTheme = (_event: SyntheticEvent<Element, Event>, checked: boolean) => {

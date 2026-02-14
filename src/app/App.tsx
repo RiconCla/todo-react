@@ -6,10 +6,12 @@ import '@fontsource/roboto/700.css'
 import AppBar from './AppBar.tsx'
 import Auth from '../entities/User/ui/Auth.tsx'
 import Todos from '../entities/Todo/ui/Todos.tsx'
-import { useUserStore } from '../entities/User/model/store/useUserStore.ts'
+import { selectUser } from '../entities/User/model/store/userStore.ts'
+import { useAppSelector } from './store.ts'
 
 function App() {
-	const user = useUserStore((state) => state.user)
+	// const user = userStore((state) => state.user)
+	const user = useAppSelector(selectUser)
 
 	return (
 		<>
