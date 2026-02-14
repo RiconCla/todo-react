@@ -10,7 +10,6 @@ import { selectUser } from '../entities/User/model/store/userStore.ts'
 import { useAppSelector } from './store.ts'
 
 function App() {
-	// const user = userStore((state) => state.user)
 	const user = useAppSelector(selectUser)
 
 	return (

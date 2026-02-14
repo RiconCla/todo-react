@@ -17,12 +17,7 @@ export const handleLogin = async (dispatch: AppDispatch, userName: string, userP
 		const accessToken = loginData.data.access_token
 		console.warn(jwtDecode(accessToken))
 		localStorage.setItem('access_token', accessToken)
-
-		console.log('UserAPI(auth.tsx)', loginData.data)
-		const setUserAction = setUser(loginData.data)
-		console.log(setUserAction)
 		dispatch(setUser(loginData.data))
-
 		dispatch(setIsLoading(false))
 		enqueueSnackbar(`Welcome, ${loginData.data.username} !`, { variant: 'success' })
 	} catch (error) {

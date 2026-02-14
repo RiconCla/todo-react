@@ -18,9 +18,7 @@ import { selectLoading } from '../model/store/userStore.ts'
 const Auth = () => {
 	const [userName, setUserName] = useState('')
 	const [userPassword, setUserPassword] = useState('')
-	// const [loading, setLoading] = useState<boolean>(false)
 	const [isLoginFormName, setLoginFormName] = useState('login')
-	// const setUser = userStore((state) => state.setUser)
 	const dispatch = useAppDispatch<AppDispatch>()
 	const loading = useSelector(selectLoading)
 

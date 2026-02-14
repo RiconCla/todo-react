@@ -12,6 +12,8 @@ import { useTodosStore } from '../entities/Todo/model/store/useTodosStore.ts'
 import { removerUser, selectUser, setUser } from '../entities/User/model/store/userStore.ts'
 import { autoLogin } from '../shared/util/autoLogin.ts'
 import { useDispatch, useSelector } from 'react-redux'
+import type { AppDispatch } from './store.ts'
+import { useEffect } from 'react'
 
 type Props = {
 	access_token?: string
@@ -23,20 +25,20 @@ const ButtonAppBar = ({ username }: Props) => {
 	const todos = useTodosStore((state) => state.todos)
 
 	const user = useSelector(selectUser)
-	const dispatch = useDispatch()
-
-	console.log('appbar', user)
-
-	// const setUser = userStore((state) => state.setUser)
+	const dispatch = useDispatch<AppDispatch>()
+	//Пришлось использовать useEffect, иначе ошибка перерендера reacta
+	useEffect(() => {
+		if (!user) {
+			const loggedUser = autoLogin()
+			if (loggedUser) {
+				dispatch(setUser(loggedUser))
+			}
+		}
+	}, [dispatch])
 
 	const undoneTodos = todos.filter((item) => !item.completed)
 	if (!mode) {
 		return null
-	}
-
-	if (!user) {
-		const loggedUser = autoLogin()
-		setUser(loggedUser)
 	}
 
 	const logOut = () => {
