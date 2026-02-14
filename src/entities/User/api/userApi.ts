@@ -3,10 +3,10 @@ import type { UserType } from '../model/userType.ts'
 import type { AxiosError } from 'axios'
 import { jwtDecode } from 'jwt-decode'
 import { enqueueSnackbar } from 'notistack'
-import type { Dispatch, SetStateAction } from 'react'
 import { setIsLoading, setUser } from '../model/store/userStore.ts'
+import type { AppDispatch } from '../../../app/store.ts'
 
-export const handleLogin = async (dispatch: Dispatch<SetStateAction>, userName: string, userPassword: string) => {
+export const handleLogin = async (dispatch: AppDispatch, userName: string, userPassword: string) => {
 	dispatch(setIsLoading(true))
 	try {
 		const loginData = await rootApi.post<UserType>('/auth/login', {
@@ -33,7 +33,7 @@ export const handleLogin = async (dispatch: Dispatch<SetStateAction>, userName: 
 	}
 }
 
-export const handleRegister = async (dispatch: Dispatch<any>, userName: string, userPassword: string) => {
+export const handleRegister = async (dispatch: AppDispatch, userName: string, userPassword: string) => {
 	if (!userName || !userPassword) return
 	dispatch(setIsLoading(true))
 

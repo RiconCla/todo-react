@@ -11,7 +11,7 @@ import {
 } from '@mui/material'
 import { AccountCircle } from '@mui/icons-material'
 import { handleLogin, handleRegister } from '../api/userApi.ts'
-import { useAppDispatch } from '../../../app/store.ts'
+import { type AppDispatch, useAppDispatch } from '../../../app/store.ts'
 import { useSelector } from 'react-redux'
 import { selectLoading } from '../model/store/userStore.ts'
 
@@ -21,7 +21,7 @@ const Auth = () => {
 	// const [loading, setLoading] = useState<boolean>(false)
 	const [isLoginFormName, setLoginFormName] = useState('login')
 	// const setUser = userStore((state) => state.setUser)
-	const dispatch = useAppDispatch()
+	const dispatch = useAppDispatch<AppDispatch>()
 	const loading = useSelector(selectLoading)
 
 	const handleUserNameChange = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
