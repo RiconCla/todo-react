@@ -19,7 +19,6 @@ type TodoProps = {
 	setTodo: (todo: TodoType) => void
 	deleteTodo: (id: string) => boolean
 }
-
 const formatDate = (dateString: string | Date) => {
 	const date = new Date(dateString)
 
@@ -28,6 +27,7 @@ const formatDate = (dateString: string | Date) => {
 
 	return `${time}\n${datePart}`
 }
+
 export const Todo = ({ todo, setTodo, deleteTodo }: TodoProps) => {
 	const handleClick = () => {
 		setTodo({ ...todo, completed: !todo.completed })

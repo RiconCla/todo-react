@@ -1,10 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { userStore } from '../entities/User/model/store/userStore.ts'
 import { useDispatch, useSelector } from 'react-redux'
+import { todosStore } from '../entities/Todo/model/store/todosStore.ts'
 
 export const store = configureStore({
 	reducer: {
 		userSlice: userStore.reducer,
+		todosSlice: todosStore.reducer,
 	},
 })
 

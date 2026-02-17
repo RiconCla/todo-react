@@ -1,17 +1,18 @@
 import { Container, FormControl, Input, Stack, Typography } from '@mui/material'
-import { useTodosStore } from '../model/store/useTodosStore.ts'
 import { Todo } from './Todo.tsx'
 import { useState } from 'react'
 import Button from '@mui/material/Button'
 import type { TodoType } from '../model/todoType.ts'
 import { enqueueSnackbar } from 'notistack'
+import { addTodos, selectTodos, setTodos } from '../model/store/todosStore.ts'
+import { type AppDispatch } from '../../../app/store.ts'
+import { useDispatch, useSelector } from 'react-redux'
 
 const Todos = () => {
 	const [newTodoTitle, setNewTodoTitle] = useState<string>('')
 	const [newTodoDescription, setNewTodoDescription] = useState<string>('')
-	const todos = useTodosStore((state) => state.todos)
-	const setTodos = useTodosStore((state) => state.setTodos)
-	const addTodos = useTodosStore((state) => state.addTodo)
+	const todos = useSelector(selectTodos)
+	const dispatch = useDispatch<AppDispatch>()
 
 	const setTodoCompleted = (todo: TodoType) => {
 		const updatedTodos = todos.map((t) => {
@@ -20,7 +21,7 @@ const Todos = () => {
 			}
 			return t
 		})
-		setTodos(updatedTodos)
+		dispatch(setTodos(updatedTodos))
 	}
 
 	const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,19 +42,19 @@ const Todos = () => {
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString(),
 		}
-		addTodos(newTodo)
+		dispatch(addTodos(newTodo))
 		setNewTodoTitle('')
 		setNewTodoDescription('')
 		enqueueSnackbar(`Card: ${newTodo.title} successfully added`, { variant: 'success' })
 	}
 
 	const handleDeleteTodo = (_id: string) => {
-		const initialLenght = todos.length
+		const initialLength = todos.length
 		const updateTodosList = todos.filter((item) => item._id !== _id)
-		if (initialLenght === updateTodosList.length) {
+		if (initialLength === updateTodosList.length) {
 			return false
 		} else {
-			setTodos(updateTodosList)
+			dispatch(setTodos(updateTodosList))
 			return true
 		}
 	}

@@ -8,12 +8,12 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import FlareIcon from '@mui/icons-material/Flare'
 import Brightness4Icon from '@mui/icons-material/Brightness4'
 import { type SyntheticEvent } from 'react'
-import { useTodosStore } from '../entities/Todo/model/store/useTodosStore.ts'
 import { removerUser, selectUser, setUser } from '../entities/User/model/store/userStore.ts'
 import { autoLogin } from '../shared/util/autoLogin.ts'
 import { useDispatch, useSelector } from 'react-redux'
 import type { AppDispatch } from './store.ts'
 import { useEffect } from 'react'
+import { selectTodos } from '../entities/Todo/model/store/todosStore.ts'
 
 type Props = {
 	access_token?: string
@@ -22,10 +22,11 @@ type Props = {
 
 const ButtonAppBar = ({ username }: Props) => {
 	const { mode, setMode } = useColorScheme()
-	const todos = useTodosStore((state) => state.todos)
+	const todos = useSelector(selectTodos)
 
 	const user = useSelector(selectUser)
 	const dispatch = useDispatch<AppDispatch>()
+
 	//Пришлось использовать useEffect, иначе ошибка перерендера reacta
 	useEffect(() => {
 		if (!user) {
