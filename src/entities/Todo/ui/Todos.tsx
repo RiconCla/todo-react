@@ -48,17 +48,6 @@ const Todos = () => {
 		enqueueSnackbar(`Card: ${newTodo.title} successfully added`, { variant: 'success' })
 	}
 
-	const handleDeleteTodo = (_id: string) => {
-		const initialLength = todos.length
-		const updateTodosList = todos.filter((item) => item._id !== _id)
-		if (initialLength === updateTodosList.length) {
-			return false
-		} else {
-			dispatch(setTodos(updateTodosList))
-			return true
-		}
-	}
-
 	return (
 		<Container>
 			<FormControl component="fieldset" sx={{ p: '20px', display: 'flex', gap: '20px', maxWidth: '25%' }}>
@@ -71,7 +60,7 @@ const Todos = () => {
 			</FormControl>
 			<Stack flexWrap={'wrap'} spacing={2} direction={'row'} gap={2}>
 				{todos.map((todo) => {
-					return <Todo todo={todo} key={todo._id} setTodo={setTodoCompleted} deleteTodo={handleDeleteTodo} />
+					return <Todo todo={todo} key={todo._id} setTodo={setTodoCompleted} />
 				})}
 			</Stack>
 		</Container>
