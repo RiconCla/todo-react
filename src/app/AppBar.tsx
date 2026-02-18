@@ -8,9 +8,11 @@ import FormControlLabel from '@mui/material/FormControlLabel'
 import FlareIcon from '@mui/icons-material/Flare'
 import Brightness4Icon from '@mui/icons-material/Brightness4'
 import { type SyntheticEvent } from 'react'
-import { useTodosStore } from '../entities/Todo/model/store/useTodosStore.ts'
-import { useUserStore } from '../entities/User/model/store/useUserStore.ts'
+import { removerUser, selectUser, setUser } from '../entities/User/model/store/userStore.ts'
 import { autoLogin } from '../shared/util/autoLogin.ts'
+import { useAppDispatch, useAppSelector } from './store.ts'
+import { useEffect } from 'react'
+import { selectTodos } from '../entities/Todo/model/store/todosStore.ts'
 
 type Props = {
 	access_token?: string
@@ -19,24 +21,29 @@ type Props = {
 
 const ButtonAppBar = ({ username }: Props) => {
 	const { mode, setMode } = useColorScheme()
-	const todos = useTodosStore((state) => state.todos)
-	const user = useUserStore((state) => state.user)
-	const clearUser = useUserStore((state) => state.clearUser)
-	const setUser = useUserStore((state) => state.setUser)
+	const todos = useAppSelector(selectTodos)
+
+	const user = useAppSelector(selectUser)
+	const dispatch = useAppDispatch()
+
+	//Пришлось использовать useEffect, иначе ошибка перерендера reacta
+	useEffect(() => {
+		if (!user) {
+			const loggedUser = autoLogin()
+			if (loggedUser) {
+				dispatch(setUser(loggedUser))
+			}
+		}
+	}, [dispatch])
 
 	const undoneTodos = todos.filter((item) => !item.completed)
 	if (!mode) {
 		return null
 	}
 
-	if (!user) {
-		const loggedUser = autoLogin()
-		setUser(loggedUser)
-	}
-
 	const logOut = () => {
 		localStorage.removeItem('access_token')
-		clearUser()
+		dispatch(removerUser())
 	}
 
 	const handleToggleTheme = (_event: SyntheticEvent<Element, Event>, checked: boolean) => {

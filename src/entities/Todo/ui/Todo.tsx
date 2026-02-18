@@ -13,11 +13,12 @@ import {
 	Typography,
 } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
+import { deleteTodos, selectTodos } from '../model/store/todosStore.ts'
+import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
 
 type TodoProps = {
 	todo: TodoType
 	setTodo: (todo: TodoType) => void
-	deleteTodo: (id: string) => boolean
 }
 
 const formatDate = (dateString: string | Date) => {
@@ -28,7 +29,11 @@ const formatDate = (dateString: string | Date) => {
 
 	return `${time}\n${datePart}`
 }
-export const Todo = ({ todo, setTodo, deleteTodo }: TodoProps) => {
+
+export const Todo = ({ todo, setTodo }: TodoProps) => {
+	const todos = useAppSelector(selectTodos)
+	const dispatch = useAppDispatch()
+
 	const handleClick = () => {
 		setTodo({ ...todo, completed: !todo.completed })
 	}
@@ -68,13 +73,13 @@ export const Todo = ({ todo, setTodo, deleteTodo }: TodoProps) => {
 		setEditing(false)
 	}
 
-	const handleDelete = () => {
-		const result = deleteTodo(todo._id)
+	const handleDelete = (_id: string) => {
+		const result = todos.some((item) => item._id === _id)
 		if (!result) {
 			enqueueSnackbar(`Delete failed. Element not found.`, { variant: 'error' })
 			return
 		}
-
+		dispatch(deleteTodos(_id))
 		enqueueSnackbar(`Card: ${todo.title} - deleted`, { variant: 'success' })
 	}
 
@@ -118,7 +123,7 @@ export const Todo = ({ todo, setTodo, deleteTodo }: TodoProps) => {
 			</CardContent>
 			<CardActions sx={{ display: 'flex', justifyContent: 'space-between' }}>
 				<Checkbox checked={todo.completed} onClick={handleClick} />
-				<DeleteIcon sx={{ cursor: 'pointer' }} onClick={handleDelete} />
+				<DeleteIcon sx={{ cursor: 'pointer' }} onClick={() => handleDelete(todo._id)} />
 			</CardActions>
 		</Card>
 	)

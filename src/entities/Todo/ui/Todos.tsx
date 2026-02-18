@@ -1,17 +1,17 @@
 import { Container, FormControl, Input, Stack, Typography } from '@mui/material'
-import { useTodosStore } from '../model/store/useTodosStore.ts'
 import { Todo } from './Todo.tsx'
 import { useState } from 'react'
 import Button from '@mui/material/Button'
 import type { TodoType } from '../model/todoType.ts'
 import { enqueueSnackbar } from 'notistack'
+import { addTodos, selectTodos, setTodos } from '../model/store/todosStore.ts'
+import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
 
 const Todos = () => {
 	const [newTodoTitle, setNewTodoTitle] = useState<string>('')
 	const [newTodoDescription, setNewTodoDescription] = useState<string>('')
-	const todos = useTodosStore((state) => state.todos)
-	const setTodos = useTodosStore((state) => state.setTodos)
-	const addTodos = useTodosStore((state) => state.addTodo)
+	const todos = useAppSelector(selectTodos)
+	const dispatch = useAppDispatch()
 
 	const setTodoCompleted = (todo: TodoType) => {
 		const updatedTodos = todos.map((t) => {
@@ -20,7 +20,7 @@ const Todos = () => {
 			}
 			return t
 		})
-		setTodos(updatedTodos)
+		dispatch(setTodos(updatedTodos))
 	}
 
 	const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,21 +41,10 @@ const Todos = () => {
 			createdAt: new Date().toISOString(),
 			updatedAt: new Date().toISOString(),
 		}
-		addTodos(newTodo)
+		dispatch(addTodos(newTodo))
 		setNewTodoTitle('')
 		setNewTodoDescription('')
 		enqueueSnackbar(`Card: ${newTodo.title} successfully added`, { variant: 'success' })
-	}
-
-	const handleDeleteTodo = (_id: string) => {
-		const initialLenght = todos.length
-		const updateTodosList = todos.filter((item) => item._id !== _id)
-		if (initialLenght === updateTodosList.length) {
-			return false
-		} else {
-			setTodos(updateTodosList)
-			return true
-		}
 	}
 
 	return (
@@ -70,7 +59,7 @@ const Todos = () => {
 			</FormControl>
 			<Stack flexWrap={'wrap'} spacing={2} direction={'row'} gap={2}>
 				{todos.map((todo) => {
-					return <Todo todo={todo} key={todo._id} setTodo={setTodoCompleted} deleteTodo={handleDeleteTodo} />
+					return <Todo todo={todo} key={todo._id} setTodo={setTodoCompleted} />
 				})}
 			</Stack>
 		</Container>

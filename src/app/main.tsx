@@ -5,6 +5,8 @@ import App from './App.tsx'
 import { createTheme } from '@mui/material/styles'
 import { ThemeProvider } from '@mui/material'
 import { SnackbarProvider } from 'notistack'
+import { Provider } from 'react-redux'
+import { store } from './store.ts'
 
 const theme = createTheme({
 	colorSchemes: {
@@ -32,12 +34,12 @@ const theme = createTheme({
 })
 
 createRoot(document.getElementById('root')!).render(
-	<>
+	<Provider store={store}>
 		<SnackbarProvider>
 			<ThemeProvider defaultMode="dark" theme={theme}>
 				<CssBaseline />
 				<App />
 			</ThemeProvider>
 		</SnackbarProvider>
-	</>
+	</Provider>
 )
