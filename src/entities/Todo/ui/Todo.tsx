@@ -13,9 +13,8 @@ import {
 	Typography,
 } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { useDispatch, useSelector } from 'react-redux'
 import { deleteTodos, selectTodos } from '../model/store/todosStore.ts'
-import type { AppDispatch } from '../../../app/store.ts'
+import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
 
 type TodoProps = {
 	todo: TodoType
@@ -32,8 +31,8 @@ const formatDate = (dateString: string | Date) => {
 }
 
 export const Todo = ({ todo, setTodo }: TodoProps) => {
-	const todos = useSelector(selectTodos)
-	const dispatch = useDispatch<AppDispatch>()
+	const todos = useAppSelector(selectTodos)
+	const dispatch = useAppDispatch()
 
 	const handleClick = () => {
 		setTodo({ ...todo, completed: !todo.completed })

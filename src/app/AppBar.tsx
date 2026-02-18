@@ -10,8 +10,7 @@ import Brightness4Icon from '@mui/icons-material/Brightness4'
 import { type SyntheticEvent } from 'react'
 import { removerUser, selectUser, setUser } from '../entities/User/model/store/userStore.ts'
 import { autoLogin } from '../shared/util/autoLogin.ts'
-import { useDispatch, useSelector } from 'react-redux'
-import type { AppDispatch } from './store.ts'
+import { useAppDispatch, useAppSelector } from './store.ts'
 import { useEffect } from 'react'
 import { selectTodos } from '../entities/Todo/model/store/todosStore.ts'
 
@@ -22,10 +21,10 @@ type Props = {
 
 const ButtonAppBar = ({ username }: Props) => {
 	const { mode, setMode } = useColorScheme()
-	const todos = useSelector(selectTodos)
+	const todos = useAppSelector(selectTodos)
 
-	const user = useSelector(selectUser)
-	const dispatch = useDispatch<AppDispatch>()
+	const user = useAppSelector(selectUser)
+	const dispatch = useAppDispatch()
 
 	//Пришлось использовать useEffect, иначе ошибка перерендера reacta
 	useEffect(() => {

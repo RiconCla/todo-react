@@ -11,16 +11,15 @@ import {
 } from '@mui/material'
 import { AccountCircle } from '@mui/icons-material'
 import { handleLogin, handleRegister } from '../api/userApi.ts'
-import { type AppDispatch, useAppDispatch } from '../../../app/store.ts'
-import { useSelector } from 'react-redux'
+import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
 import { selectLoading } from '../model/store/userStore.ts'
 
 const Auth = () => {
 	const [userName, setUserName] = useState('')
 	const [userPassword, setUserPassword] = useState('')
 	const [isLoginFormName, setLoginFormName] = useState('login')
-	const dispatch = useAppDispatch<AppDispatch>()
-	const loading = useSelector(selectLoading)
+	const dispatch = useAppDispatch()
+	const loading = useAppSelector(selectLoading)
 
 	const handleUserNameChange = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
 		setUserName(e.currentTarget.value)

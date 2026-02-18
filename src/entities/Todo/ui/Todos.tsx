@@ -5,14 +5,13 @@ import Button from '@mui/material/Button'
 import type { TodoType } from '../model/todoType.ts'
 import { enqueueSnackbar } from 'notistack'
 import { addTodos, selectTodos, setTodos } from '../model/store/todosStore.ts'
-import { type AppDispatch } from '../../../app/store.ts'
-import { useDispatch, useSelector } from 'react-redux'
+import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
 
 const Todos = () => {
 	const [newTodoTitle, setNewTodoTitle] = useState<string>('')
 	const [newTodoDescription, setNewTodoDescription] = useState<string>('')
-	const todos = useSelector(selectTodos)
-	const dispatch = useDispatch<AppDispatch>()
+	const todos = useAppSelector(selectTodos)
+	const dispatch = useAppDispatch()
 
 	const setTodoCompleted = (todo: TodoType) => {
 		const updatedTodos = todos.map((t) => {
