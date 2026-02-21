@@ -1,0 +1,7 @@
+a.active {
+    color: #fff;
+}
+
+a:visited {
+    color: inherit;
+}

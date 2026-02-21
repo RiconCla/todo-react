@@ -5,8 +5,14 @@ import { jwtDecode } from 'jwt-decode'
 import { enqueueSnackbar } from 'notistack'
 import { setIsLoading, setUser } from '../model/store/userStore.ts'
 import type { AppDispatch } from '../../../app/store.ts'
+import { type NavigateFunction } from 'react-router'
 
-export const handleLogin = async (dispatch: AppDispatch, userName: string, userPassword: string) => {
+export const handleLogin = async (
+	navigate: NavigateFunction,
+	dispatch: AppDispatch,
+	userName: string,
+	userPassword: string
+) => {
 	dispatch(setIsLoading(true))
 	try {
 		const loginData = await rootApi.post<UserType>('/auth/login', {
@@ -19,6 +25,7 @@ export const handleLogin = async (dispatch: AppDispatch, userName: string, userP
 		localStorage.setItem('access_token', accessToken)
 		dispatch(setUser(loginData.data))
 		dispatch(setIsLoading(false))
+		navigate('/')
 		enqueueSnackbar(`Welcome, ${loginData.data.username} !`, { variant: 'success' })
 	} catch (error) {
 		const axiosError = error as AxiosError<{ message: string }>
@@ -28,7 +35,12 @@ export const handleLogin = async (dispatch: AppDispatch, userName: string, userP
 	}
 }
 
-export const handleRegister = async (dispatch: AppDispatch, userName: string, userPassword: string) => {
+export const handleRegister = async (
+	navigate: NavigateFunction,
+	dispatch: AppDispatch,
+	userName: string,
+	userPassword: string
+) => {
 	if (!userName || !userPassword) return
 	dispatch(setIsLoading(true))
 
@@ -39,7 +51,7 @@ export const handleRegister = async (dispatch: AppDispatch, userName: string, us
 		})
 
 		enqueueSnackbar(`Registration successful!`, { variant: 'success' })
-		return await handleLogin(dispatch, userName, userPassword)
+		return await handleLogin(navigate, dispatch, userName, userPassword)
 	} catch (error) {
 		dispatch(setIsLoading(false))
 		const axiosError = error as AxiosError<{ message: string }>
