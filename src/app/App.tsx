@@ -6,14 +6,7 @@ import '@fontsource/roboto/700.css'
 import Todos from '../entities/Todo/ui/Todos.tsx'
 
 function App() {
-	//const user = useAppSelector(selectUser)
-
-	return (
-		<>
-			<Todos />
-		</>
-	)
-	// return <>{user ? <Todos /> : <Auth />}</>
+	return <Todos />
 }
 
 export default App

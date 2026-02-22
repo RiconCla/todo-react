@@ -47,6 +47,7 @@ const ButtonAppBar = ({ username }: Props) => {
 	const isAboutPage = location.pathname === '/about'
 
 	const isOpen = useAppSelector(selectAccordionState)
+	const setToggleAccordion = () => dispatch(toggleAccordion())
 
 	//Пришлось использовать useEffect, иначе ошибка перерендера reacta
 	useEffect(() => {
@@ -163,11 +164,11 @@ const ButtonAppBar = ({ username }: Props) => {
 						color="inherit"
 						aria-label="menu"
 						sx={{ mr: 2 }}
-						onClick={() => dispatch(toggleAccordion())}
+						onClick={setToggleAccordion}
 					>
 						<MenuIcon />
 					</IconButton>
-					<Drawer open={isOpen} onClose={() => dispatch(toggleAccordion())}>
+					<Drawer open={isOpen} onClose={setToggleAccordion}>
 						<Acordion />
 					</Drawer>
 
