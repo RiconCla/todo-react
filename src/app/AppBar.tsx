@@ -2,7 +2,18 @@ import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import IconButton from '@mui/material/IconButton'
 import MenuIcon from '@mui/icons-material/Menu'
-import { Toolbar, Typography, AppBar, Avatar, Tooltip, Stack, styled, type SwitchProps, Switch } from '@mui/material'
+import {
+	Toolbar,
+	Typography,
+	AppBar,
+	Avatar,
+	Tooltip,
+	Stack,
+	styled,
+	type SwitchProps,
+	Switch,
+	Drawer,
+} from '@mui/material'
 import { useColorScheme } from '@mui/material/styles'
 import FormControlLabel from '@mui/material/FormControlLabel'
 import FlareIcon from '@mui/icons-material/Flare'
@@ -12,7 +23,11 @@ import { removerUser, selectUser, setUser } from '../entities/User/model/store/u
 import { autoLogin } from '../shared/util/autoLogin.ts'
 import { useAppDispatch, useAppSelector } from './store.ts'
 import { useEffect } from 'react'
-import { selectTodos } from '../entities/Todo/model/store/todosStore.ts'
+import { selectUnDoneTodosLength } from '../entities/Todo/model/store/selectors/selectUnDoneTodos.ts'
+import { NavLink, useLocation, useNavigate } from 'react-router'
+import { selectDoneTodosLength } from '../entities/Todo/model/store/selectors/selectDoneTodos.tsx'
+import Acordion from '../entities/Accordion/ui/acordion.tsx'
+import { selectAccordionState, toggleAccordion } from '../entities/Accordion/model/store/accordionStore.ts'
 
 type Props = {
 	access_token?: string
@@ -21,10 +36,18 @@ type Props = {
 
 const ButtonAppBar = ({ username }: Props) => {
 	const { mode, setMode } = useColorScheme()
-	const todos = useAppSelector(selectTodos)
+	const unDoneTodosLength = useAppSelector(selectUnDoneTodosLength)
+	const doneTodosLength = useAppSelector(selectDoneTodosLength)
 
 	const user = useAppSelector(selectUser)
 	const dispatch = useAppDispatch()
+
+	const location = useLocation()
+	const navigate = useNavigate()
+	const isAboutPage = location.pathname === '/about'
+
+	const isOpen = useAppSelector(selectAccordionState)
+	const setToggleAccordion = () => dispatch(toggleAccordion())
 
 	//Пришлось использовать useEffect, иначе ошибка перерендера reacta
 	useEffect(() => {
@@ -36,7 +59,6 @@ const ButtonAppBar = ({ username }: Props) => {
 		}
 	}, [dispatch])
 
-	const undoneTodos = todos.filter((item) => !item.completed)
 	if (!mode) {
 		return null
 	}
@@ -136,17 +158,35 @@ const ButtonAppBar = ({ username }: Props) => {
 		<Box sx={{ flexGrow: 1 }}>
 			<AppBar position="fixed">
 				<Toolbar>
-					<IconButton size="large" edge="start" color="inherit" aria-label="menu" sx={{ mr: 2 }}>
+					<IconButton
+						size="large"
+						edge="start"
+						color="inherit"
+						aria-label="menu"
+						sx={{ mr: 2 }}
+						onClick={setToggleAccordion}
+					>
 						<MenuIcon />
 					</IconButton>
+					<Drawer open={isOpen} onClose={setToggleAccordion}>
+						<Acordion />
+					</Drawer>
+
 					<Stack direction={'row'} spacing={2} style={{ flexGrow: 1 }}>
 						{username && (
-							<Typography variant="h6" component="div">
-								Todos{' ' + undoneTodos.length}
-							</Typography>
+							<Stack direction={'row'} spacing={2}>
+								<Typography variant="h6" component="div">
+									Incomplete{': ' + unDoneTodosLength}
+								</Typography>
+								<Typography variant="h6" component="div">
+									Completed{': ' + doneTodosLength}
+								</Typography>
+							</Stack>
 						)}
 						<Typography variant="h6" component="div">
-							About
+							<NavLink to={isAboutPage ? '/' : '/about'}>
+								{({ isActive }) => <span className={isActive ? 'active' : ''}>{isAboutPage ? 'Home' : 'About'}</span>}
+							</NavLink>
 						</Typography>
 					</Stack>
 					<Stack direction="row" spacing={2} sx={{ marginRight: '25px' }}>
@@ -165,12 +205,14 @@ const ButtonAppBar = ({ username }: Props) => {
 							<Button sx={{ marginRight: '10px' }} color="inherit" onClick={logOut}>
 								Logout
 							</Button>
-							<Tooltip title="User">
+							<Tooltip title={username}>
 								<Avatar src={''} alt={username} {...stringAvatar(username)} />
 							</Tooltip>
 						</Stack>
 					) : (
-						<Button color="inherit">Login</Button>
+						<Button color="inherit" onClick={() => navigate('/')}>
+							Login
+						</Button>
 					)}
 				</Toolbar>
 			</AppBar>

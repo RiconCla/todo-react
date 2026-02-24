@@ -84,8 +84,8 @@ export const Todo = ({ todo, setTodo }: TodoProps) => {
 	}
 
 	return (
-		<Card variant={'outlined'} sx={{ width: 250 }}>
-			<CardContent>
+		<Card variant={'outlined'} sx={{ width: 250, display: 'flex', flexDirection: 'column', minHeight: 260 }}>
+			<CardContent sx={{ flexGrow: 1 }}>
 				{isEditing ? (
 					<ClickAwayListener onClickAway={handleSave}>
 						<Stack direction={'column'} spacing={1}>
@@ -98,30 +98,42 @@ export const Todo = ({ todo, setTodo }: TodoProps) => {
 						<Typography
 							onDoubleClick={isEditing ? undefined : handleEdit}
 							gutterBottom
-							sx={{ color: 'text.secondary', fontSize: 14 }}
+							sx={{
+								color: 'text.secondary',
+								fontSize: 14,
+								display: '-webkit-box',
+								WebkitBoxOrient: 'vertical',
+								WebkitLineClamp: 3,
+								overflow: 'hidden',
+							}}
 						>
 							{todo.title}
 						</Typography>
-						<Typography onDoubleClick={isEditing ? undefined : handleEdit} variant="body2">
+						<Typography
+							onDoubleClick={isEditing ? undefined : handleEdit}
+							variant="body2"
+							sx={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 4, overflow: 'hidden' }}
+						>
 							{todo.description}
 						</Typography>
 					</Stack>
 				)}
-
-				<Typography variant="body1">
-					Created:{' '}
-					<Typography component="span" color="info">
-						{formatDate(todo.createdAt)}
+				<Stack display={'flex'} direction={'column'} spacing={1} sx={{ marginTop: '20px' }}>
+					<Typography variant="body1">
+						Created:{' '}
+						<Typography component="span" color="info">
+							{formatDate(todo.createdAt)}
+						</Typography>
 					</Typography>
-				</Typography>
-				<Typography variant="body1">
-					Updated:{' '}
-					<Typography component="span" color="info">
-						{formatDate(todo.updatedAt)}
+					<Typography variant="body1">
+						Updated:{' '}
+						<Typography component="span" color="info">
+							{formatDate(todo.updatedAt)}
+						</Typography>
 					</Typography>
-				</Typography>
+				</Stack>
 			</CardContent>
-			<CardActions sx={{ display: 'flex', justifyContent: 'space-between' }}>
+			<CardActions sx={{ display: 'flex', justifyContent: 'space-between', mt: 'auto', minHeight: 50 }}>
 				<Checkbox checked={todo.completed} onClick={handleClick} />
 				<DeleteIcon sx={{ cursor: 'pointer' }} onClick={() => handleDelete(todo._id)} />
 			</CardActions>

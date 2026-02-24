@@ -2,11 +2,15 @@ import { configureStore } from '@reduxjs/toolkit'
 import { userStore } from '../entities/User/model/store/userStore.ts'
 import { useDispatch, useSelector } from 'react-redux'
 import { todosStore } from '../entities/Todo/model/store/todosStore.ts'
+import { accordionItemsStore } from '../entities/Accordion/model/store/accordionItemsStore.ts'
+import { accordionStateStore } from '../entities/Accordion/model/store/accordionStore.ts'
 
 export const store = configureStore({
 	reducer: {
 		userSlice: userStore.reducer,
 		todosSlice: todosStore.reducer,
+		accordionItemsSlice: accordionItemsStore.reducer,
+		accordionStateSlice: accordionStateStore.reducer,
 	},
 })
 

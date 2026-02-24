@@ -13,6 +13,7 @@ import { AccountCircle } from '@mui/icons-material'
 import { handleLogin, handleRegister } from '../api/userApi.ts'
 import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
 import { selectLoading } from '../model/store/userStore.ts'
+import { useNavigate } from 'react-router'
 
 const Auth = () => {
 	const [userName, setUserName] = useState('')
@@ -20,6 +21,7 @@ const Auth = () => {
 	const [isLoginFormName, setLoginFormName] = useState('login')
 	const dispatch = useAppDispatch()
 	const loading = useAppSelector(selectLoading)
+	const navigate = useNavigate()
 
 	const handleUserNameChange = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
 		setUserName(e.currentTarget.value)
@@ -94,7 +96,7 @@ const Auth = () => {
 						<Button
 							variant="contained"
 							color="primary"
-							onClick={() => handleLogin(dispatch, userName, userPassword)}
+							onClick={() => handleLogin(navigate, dispatch, userName, userPassword)}
 							fullWidth
 							loadingPosition="start"
 							loading={loading}
@@ -145,7 +147,7 @@ const Auth = () => {
 						<Button
 							variant="contained"
 							color="primary"
-							onClick={() => handleRegister(dispatch, userName, userPassword)}
+							onClick={() => handleRegister(navigate, dispatch, userName, userPassword)}
 							fullWidth
 							loadingPosition="start"
 							loading={loading}

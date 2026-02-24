@@ -1,4 +1,4 @@
-import { Container, FormControl, Input, Stack, Typography } from '@mui/material'
+import { Container, Input, Stack, Typography } from '@mui/material'
 import { Todo } from './Todo.tsx'
 import { useState } from 'react'
 import Button from '@mui/material/Button'
@@ -49,15 +49,15 @@ const Todos = () => {
 
 	return (
 		<Container>
-			<FormControl component="fieldset" sx={{ p: '20px', display: 'flex', gap: '20px', maxWidth: '25%' }}>
+			<Stack sx={{ marginBottom: '20px', display: 'flex', gap: '20px', maxWidth: '250px' }}>
 				<Typography variant={'h5'}>Create new Todo</Typography>
 				<Input placeholder={'title'} value={newTodoTitle} onChange={handleTitleChange} />
 				<Input placeholder={'description'} value={newTodoDescription} onChange={handleDescriptionChange} />
 				<Button variant="contained" disabled={!newTodoTitle} onClick={handleAddTodo}>
 					Add
 				</Button>
-			</FormControl>
-			<Stack flexWrap={'wrap'} spacing={2} direction={'row'} gap={2}>
+			</Stack>
+			<Stack flexWrap={'wrap'} useFlexGap direction={'row'} gap={2} alignItems="stretch">
 				{todos.map((todo) => {
 					return <Todo todo={todo} key={todo._id} setTodo={setTodoCompleted} />
 				})}
