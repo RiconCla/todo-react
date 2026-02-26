@@ -12,8 +12,8 @@ import {
 import { AccountCircle } from '@mui/icons-material'
 import { handleLogin, handleRegister } from '../api/userApi.ts'
 import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
-import { selectLoading } from '../model/store/userStore.ts'
-import { useNavigate } from 'react-router'
+import { selectLoading, selectUser } from '../model/store/userStore.ts'
+import { Navigate, useNavigate } from 'react-router'
 
 const Auth = () => {
 	const [userName, setUserName] = useState('')
@@ -22,6 +22,11 @@ const Auth = () => {
 	const dispatch = useAppDispatch()
 	const loading = useAppSelector(selectLoading)
 	const navigate = useNavigate()
+	const user = useAppSelector(selectUser)
+
+	if (user) {
+		return <Navigate to={'/'} />
+	}
 
 	const handleUserNameChange = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
 		setUserName(e.currentTarget.value)
@@ -37,6 +42,7 @@ const Auth = () => {
 
 	const handleChange = (_event: React.MouseEvent<HTMLElement>, newAlignment: string) => {
 		setLoginFormName(newAlignment)
+		// navigate(`/auth/${newAlignment}`)
 	}
 
 	return (

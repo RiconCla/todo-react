@@ -68,6 +68,10 @@ const ButtonAppBar = ({ username }: Props) => {
 		dispatch(removerUser())
 	}
 
+	const handleRedirectToProfile = () => {
+		navigate('/profile')
+	}
+
 	const handleToggleTheme = (_event: SyntheticEvent<Element, Event>, checked: boolean) => {
 		setMode(checked ? 'dark' : 'light')
 	}
@@ -202,6 +206,9 @@ const ButtonAppBar = ({ username }: Props) => {
 					</Stack>
 					{username ? (
 						<Stack direction="row">
+							<Button sx={{ marginRight: '10px' }} color="inherit" onClick={handleRedirectToProfile}>
+								Profile
+							</Button>
 							<Button sx={{ marginRight: '10px' }} color="inherit" onClick={logOut}>
 								Logout
 							</Button>
