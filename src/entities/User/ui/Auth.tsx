@@ -13,16 +13,16 @@ import { AccountCircle } from '@mui/icons-material'
 import { handleLogin, handleRegister } from '../api/userApi.ts'
 import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
 import { selectLoading, selectUser } from '../model/store/userStore.ts'
-import { Navigate, useNavigate } from 'react-router'
+import { Navigate, useNavigate, useParams } from 'react-router'
 
 const Auth = () => {
 	const [userName, setUserName] = useState('')
 	const [userPassword, setUserPassword] = useState('')
-	const [isLoginFormName, setLoginFormName] = useState('login')
 	const dispatch = useAppDispatch()
 	const loading = useAppSelector(selectLoading)
 	const navigate = useNavigate()
 	const user = useAppSelector(selectUser)
+	const { mode } = useParams()
 
 	if (user) {
 		return <Navigate to={'/'} />
@@ -40,9 +40,10 @@ const Auth = () => {
 		setUserPassword('')
 	}
 
-	const handleChange = (_event: React.MouseEvent<HTMLElement>, newAlignment: string) => {
-		setLoginFormName(newAlignment)
-		// navigate(`/auth/${newAlignment}`)
+	const handleChange = (_event: React.MouseEvent, mode: string) => {
+		if (mode !== null) {
+			navigate(`/auth/${mode}`)
+		}
 	}
 
 	return (
@@ -51,7 +52,7 @@ const Auth = () => {
 				<ToggleButtonGroup
 					size={'small'}
 					color="primary"
-					value={isLoginFormName}
+					value={mode}
 					exclusive
 					fullWidth
 					onChange={handleChange}
@@ -62,7 +63,7 @@ const Auth = () => {
 					<ToggleButton value="login">Login</ToggleButton>
 					<ToggleButton value="register">Register</ToggleButton>
 				</ToggleButtonGroup>
-				{isLoginFormName === 'login' ? (
+				{mode === 'login' ? (
 					<Stack direction={'column'} spacing={2}>
 						<TextField
 							disabled={loading ? true : false}
@@ -157,7 +158,7 @@ const Auth = () => {
 							fullWidth
 							loadingPosition="start"
 							loading={loading}
-							sx={{ backgroundColor: isLoginFormName === 'login' ? '#1976d2' : '#dc004e' }}
+							sx={{ backgroundColor: mode === 'login' ? '#1976d2' : '#dc004e' }}
 						>
 							{loading ? 'Loading' : 'Register'}
 						</Button>

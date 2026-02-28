@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router'
+import { Navigate, Route, Routes } from 'react-router'
 import App from './App.tsx'
 import About from '../entities/App/ui/About.tsx'
 import NotFound from '../entities/App/ui/NotFound.tsx'
@@ -12,13 +12,12 @@ const AppRoutes = () => {
 		<Routes>
 			<Route element={<Layout />}>
 				<Route element={<Redirector />}>
-					{/*<Route element={<ProtectedLayout />}>*/}
 					<Route index element={<App />} />
 					<Route path="/about" element={<About />} />
 					<Route path="/profile" element={<Profile />} />
 				</Route>
-				{/*</Route>*/}
-				<Route path="/auth" element={<Auth />} />
+				<Route path="/auth" element={<Navigate to="/auth/login" replace />} />
+				<Route path="/auth/:mode" element={<Auth />} />
 				<Route path="*" element={<NotFound />} />
 			</Route>
 		</Routes>

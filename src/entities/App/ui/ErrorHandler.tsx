@@ -1,6 +1,7 @@
 import React, { Component, type PropsWithChildren } from 'react'
-import { Typography } from '@mui/material'
+import { Container, Typography } from '@mui/material'
 import { NavLink } from 'react-router'
+import Button from '@mui/material/Button'
 
 class ErrorHandler extends Component<PropsWithChildren, { hasError: boolean }> {
 	constructor(props: PropsWithChildren) {
@@ -22,7 +23,14 @@ class ErrorHandler extends Component<PropsWithChildren, { hasError: boolean }> {
 				<>
 					<Typography variant={'h1'}>Something went wrong</Typography>
 					<Typography variant={'body1'}>Please try to reload page or contact support</Typography>
-					<NavLink to={'/'}>Go back to homepage</NavLink>
+					<NavLink to={'/'} onClick={() => this.setState({ hasError: false })}>
+						Go back to homepage
+					</NavLink>
+					<Container sx={{ paddingY: 2, m: 0 }}>
+						<Button variant={'contained'} color={'warning'} onClick={() => this.setState({ hasError: false })}>
+							Reset Error
+						</Button>
+					</Container>
 				</>
 			)
 		}

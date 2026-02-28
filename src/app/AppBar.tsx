@@ -185,13 +185,15 @@ const ButtonAppBar = ({ username }: Props) => {
 								<Typography variant="h6" component="div">
 									Completed{': ' + doneTodosLength}
 								</Typography>
+								<Typography variant="h6" component="div">
+									<NavLink to={isAboutPage ? '/' : '/about'}>
+										{({ isActive }) => (
+											<span className={isActive ? 'active' : ''}>{isAboutPage ? 'Home' : 'About'}</span>
+										)}
+									</NavLink>
+								</Typography>
 							</Stack>
 						)}
-						<Typography variant="h6" component="div">
-							<NavLink to={isAboutPage ? '/' : '/about'}>
-								{({ isActive }) => <span className={isActive ? 'active' : ''}>{isAboutPage ? 'Home' : 'About'}</span>}
-							</NavLink>
-						</Typography>
 					</Stack>
 					<Stack direction="row" spacing={2} sx={{ marginRight: '25px' }}>
 						<FlareIcon />
