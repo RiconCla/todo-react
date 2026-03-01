@@ -12,11 +12,11 @@ const AppRoutes = () => {
 		<Routes>
 			<Route element={<Layout />}>
 				<Route element={<Redirector />}>
-					<Route index element={<App />} />
-					<Route path="/about" element={<About />} />
-					<Route path="/profile" element={<Profile />} />
+					<Route index element={<App />} /> //если элемент с типом index,то вложенные в него элементы можно указывать без слеша
+					<Route path="about" element={<About />} />
+					<Route path="profile" element={<Profile />} />
 				</Route>
-				<Route path="/auth/:mode" element={<Auth />} />
+				<Route path="auth/:mode" element={<Auth />} />
 				<Route path="*" element={<NotFound />} />
 			</Route>
 		</Routes>

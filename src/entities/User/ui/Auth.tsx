@@ -24,14 +24,11 @@ const Auth = () => {
 	const user = useAppSelector(selectUser)
 	const { mode } = useParams()
 	const stateLocation = useLocation().state
-	console.log(stateLocation)
 
-	if (user && stateLocation !== '/') {
-		return <Navigate to={`${stateLocation}`} />
+	if(user) {
+		return <Navigate to={stateLocation || '/'}/>
 	}
-	if (user && stateLocation === '/') {
-		return <Navigate to={`/`} />
-	}
+
 
 	const handleUserNameChange = (e: SyntheticEvent<HTMLTextAreaElement | HTMLInputElement>) => {
 		setUserName(e.currentTarget.value)
