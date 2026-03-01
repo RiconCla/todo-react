@@ -11,7 +11,7 @@ const Redirector = () => {
 	const userFromLocation = location.pathname //запоминаем откуда пришел юзер
 
 	if (!user && !userFromLs) {
-		return <Navigate to="/auth" state={userFromLocation} /> //передаем в стэйт откуда был переход изначально
+		return <Navigate to="/auth/login" state={userFromLocation} /> //передаем в стэйт откуда был переход изначально
 	}
 
 	if (!user && userFromLs) {

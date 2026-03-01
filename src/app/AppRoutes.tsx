@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from 'react-router'
+import { Route, Routes } from 'react-router'
 import App from './App.tsx'
 import About from '../entities/App/ui/About.tsx'
 import NotFound from '../entities/App/ui/NotFound.tsx'
@@ -16,7 +16,6 @@ const AppRoutes = () => {
 					<Route path="/about" element={<About />} />
 					<Route path="/profile" element={<Profile />} />
 				</Route>
-				<Route path="/auth" element={<Navigate to="/auth/login" replace />} />
 				<Route path="/auth/:mode" element={<Auth />} />
 				<Route path="*" element={<NotFound />} />
 			</Route>
