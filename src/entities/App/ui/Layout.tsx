@@ -2,6 +2,7 @@ import AppBar from '../../../app/AppBar.tsx'
 import { useAppSelector } from '../../../app/store.ts'
 import { selectUser } from '../../User/model/store/userStore.ts'
 import { Outlet } from 'react-router'
+import ErrorHandler from './ErrorHandler.tsx'
 
 const Layout = () => {
 	const user = useAppSelector(selectUser)
@@ -9,7 +10,9 @@ const Layout = () => {
 		<>
 			<AppBar username={user?.username} />
 			<div style={{ marginTop: '100px' }}>
-				<Outlet />
+				<ErrorHandler>
+					<Outlet />
+				</ErrorHandler>
 			</div>
 		</>
 	)

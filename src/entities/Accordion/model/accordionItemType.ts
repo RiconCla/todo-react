@@ -3,4 +3,5 @@ export type AccordionItemType = {
 	title: string
 	sequence: number
 	route: string
+	protectedAuth: boolean
 }

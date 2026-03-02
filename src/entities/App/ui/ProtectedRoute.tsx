@@ -10,7 +10,7 @@ type Props = {
 const ProtectedRoute = ({ children }: Props) => {
 	const user = useAppSelector(selectUser)
 	const location = useLocation()
-	const shouldRedirectToLogin = !user && !location.pathname.includes('/auth')
+	const shouldRedirectToLogin = !user && !location.pathname.includes('/auth') && !location.pathname.includes('/profile')
 	const shouldRedirectFromLogin = user && location.pathname.includes('/auth')
 
 	if (shouldRedirectToLogin) {

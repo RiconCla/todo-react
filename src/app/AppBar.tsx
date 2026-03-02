@@ -68,6 +68,10 @@ const ButtonAppBar = ({ username }: Props) => {
 		dispatch(removerUser())
 	}
 
+	const handleRedirectToProfile = () => {
+		navigate('/profile')
+	}
+
 	const handleToggleTheme = (_event: SyntheticEvent<Element, Event>, checked: boolean) => {
 		setMode(checked ? 'dark' : 'light')
 	}
@@ -181,13 +185,15 @@ const ButtonAppBar = ({ username }: Props) => {
 								<Typography variant="h6" component="div">
 									Completed{': ' + doneTodosLength}
 								</Typography>
+								<Typography variant="h6" component="div">
+									<NavLink to={isAboutPage ? '/' : '/about'}>
+										{({ isActive }) => (
+											<span className={isActive ? 'active' : ''}>{isAboutPage ? 'Home' : 'About'}</span>
+										)}
+									</NavLink>
+								</Typography>
 							</Stack>
 						)}
-						<Typography variant="h6" component="div">
-							<NavLink to={isAboutPage ? '/' : '/about'}>
-								{({ isActive }) => <span className={isActive ? 'active' : ''}>{isAboutPage ? 'Home' : 'About'}</span>}
-							</NavLink>
-						</Typography>
 					</Stack>
 					<Stack direction="row" spacing={2} sx={{ marginRight: '25px' }}>
 						<FlareIcon />
@@ -202,6 +208,9 @@ const ButtonAppBar = ({ username }: Props) => {
 					</Stack>
 					{username ? (
 						<Stack direction="row">
+							<Button sx={{ marginRight: '10px' }} color="inherit" onClick={handleRedirectToProfile}>
+								Profile
+							</Button>
 							<Button sx={{ marginRight: '10px' }} color="inherit" onClick={logOut}>
 								Logout
 							</Button>
