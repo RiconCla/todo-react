@@ -1,17 +1,22 @@
-import { Container, Input, Stack, Typography } from '@mui/material'
+import { CircularProgress, Container, Input, Stack, Typography } from '@mui/material'
 import { Todo } from './Todo.tsx'
-import { useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Button from '@mui/material/Button'
-import type { TodoType } from '../model/todoType.ts'
+import type { CreateTodoType, TodoType } from '../model/todoType.ts'
 import { enqueueSnackbar } from 'notistack'
-import { addTodos, selectTodos, setTodos } from '../model/store/todosStore.ts'
+import { selectTodos, setTodos } from '../model/store/todosStore.ts'
 import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
+import { addTodo, getTodos } from '../api/todoApi.ts'
+import { selectUser } from '../../User/model/store/userStore.ts'
 
 const Todos = () => {
+	const [isLoading, setIsLoading] = useState(true)
 	const [newTodoTitle, setNewTodoTitle] = useState<string>('')
 	const [newTodoDescription, setNewTodoDescription] = useState<string>('')
 	const todos = useAppSelector(selectTodos)
 	const dispatch = useAppDispatch()
+	const user = useAppSelector(selectUser)
+	const token = user?.access_token
 
 	const setTodoCompleted = (todo: TodoType) => {
 		const updatedTodos = todos.map((t) => {
@@ -23,6 +28,20 @@ const Todos = () => {
 		dispatch(setTodos(updatedTodos))
 	}
 
+	const handleGetTodos = useCallback(async () => {
+		getTodos()
+			.then((todos) => {
+				dispatch(setTodos(todos.data || []))
+			})
+			.catch(() => {
+				enqueueSnackbar('Error fetching todos...', { variant: 'error' })
+				dispatch(setTodos([]))
+			})
+			.finally(() => {
+				setIsLoading(false)
+			})
+	}, [dispatch])
+
 	const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setNewTodoTitle(e.target.value)
 	}
@@ -31,20 +50,34 @@ const Todos = () => {
 		setNewTodoDescription(e.target.value)
 	}
 
-	const handleAddTodo = () => {
-		const newTodo: TodoType = {
-			_id: Date.now().toString(),
-			title: newTodoTitle,
-			order: todos.length + 1,
-			completed: false,
-			description: newTodoDescription,
-			createdAt: new Date().toISOString(),
-			updatedAt: new Date().toISOString(),
+	const handleAddTodo = async () => {
+		try {
+			setIsLoading(true)
+			if (!token) return
+			const newTodo: CreateTodoType = {
+				title: newTodoTitle,
+				description: newTodoDescription,
+			}
+			await addTodo(newTodo)
+			setNewTodoTitle('')
+			setNewTodoDescription('')
+			await handleGetTodos()
+
+			enqueueSnackbar(`Card: ${newTodo.title} successfully added`, { variant: 'success' })
+		} catch (e) {
+			console.error(e)
+			enqueueSnackbar(`Error adding todo :(`, { variant: 'error' })
+		} finally {
+			setIsLoading(false)
 		}
-		dispatch(addTodos(newTodo))
-		setNewTodoTitle('')
-		setNewTodoDescription('')
-		enqueueSnackbar(`Card: ${newTodo.title} successfully added`, { variant: 'success' })
+	}
+
+	useEffect(() => {
+		handleGetTodos()
+	}, [handleGetTodos])
+
+	if (isLoading) {
+		return <CircularProgress />
 	}
 
 	return (
