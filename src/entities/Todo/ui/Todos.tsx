@@ -1,4 +1,4 @@
-import { CircularProgress, Container, Input, Stack, Typography } from '@mui/material'
+import { Backdrop, CircularProgress, Container, Input, Stack, Typography } from '@mui/material'
 import { Todo } from './Todo.tsx'
 import { useCallback, useEffect, useState } from 'react'
 import Button from '@mui/material/Button'
@@ -31,7 +31,7 @@ const Todos = () => {
 	const handleGetTodos = useCallback(async () => {
 		getTodos()
 			.then((todos) => {
-				dispatch(setTodos(todos.data || []))
+				dispatch(setTodos(todos.data.reverse() || []))
 			})
 			.catch(() => {
 				enqueueSnackbar('Error fetching todos...', { variant: 'error' })
@@ -76,26 +76,27 @@ const Todos = () => {
 		handleGetTodos()
 	}, [handleGetTodos])
 
-	if (isLoading) {
-		return <CircularProgress />
-	}
-
 	return (
-		<Container>
-			<Stack sx={{ marginBottom: '20px', display: 'flex', gap: '20px', maxWidth: '250px' }}>
-				<Typography variant={'h5'}>Create new Todo</Typography>
-				<Input placeholder={'title'} value={newTodoTitle} onChange={handleTitleChange} />
-				<Input placeholder={'description'} value={newTodoDescription} onChange={handleDescriptionChange} />
-				<Button variant="contained" disabled={!newTodoTitle} onClick={handleAddTodo}>
-					Add
-				</Button>
-			</Stack>
-			<Stack flexWrap={'wrap'} useFlexGap direction={'row'} gap={2} alignItems="stretch">
-				{todos.map((todo) => {
-					return <Todo todo={todo} key={todo._id} setTodo={setTodoCompleted} />
-				})}
-			</Stack>
-		</Container>
+		<>
+			<Backdrop sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }} open={isLoading}>
+				<CircularProgress color="inherit" />
+			</Backdrop>
+			<Container>
+				<Stack sx={{ marginBottom: '20px', display: 'flex', gap: '20px', maxWidth: '250px' }}>
+					<Typography variant={'h5'}>Create new Todo</Typography>
+					<Input placeholder={'title'} value={newTodoTitle} onChange={handleTitleChange} />
+					<Input placeholder={'description'} value={newTodoDescription} onChange={handleDescriptionChange} />
+					<Button variant="contained" disabled={!newTodoTitle} onClick={handleAddTodo}>
+						Add
+					</Button>
+				</Stack>
+				<Stack flexWrap={'wrap'} useFlexGap direction={'row'} gap={2} alignItems="stretch">
+					{todos.map((todo) => {
+						return <Todo todo={todo} key={todo._id} setTodo={setTodoCompleted} />
+					})}
+				</Stack>
+			</Container>
+		</>
 	)
 }
 

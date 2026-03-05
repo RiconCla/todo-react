@@ -3,18 +3,21 @@ import type { TodoType } from '../model/todoType.ts'
 import { useSnackbar } from 'notistack'
 import { type SetStateAction, useState } from 'react'
 import {
+	Backdrop,
 	Card,
 	CardActions,
 	CardContent,
 	Checkbox,
+	CircularProgress,
 	ClickAwayListener,
 	Stack,
 	TextField,
 	Typography,
 } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { deleteTodos, selectTodos } from '../model/store/todosStore.ts'
-import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
+import { deleteTodos } from '../model/store/todosStore.ts'
+import { useAppDispatch } from '../../../app/store.ts'
+import { deleteTodo, patchTodo } from '../api/todoApi.ts'
 
 type TodoProps = {
 	todo: TodoType
@@ -31,18 +34,29 @@ const formatDate = (dateString: string | Date) => {
 }
 
 export const Todo = ({ todo, setTodo }: TodoProps) => {
-	const todos = useAppSelector(selectTodos)
 	const dispatch = useAppDispatch()
-
-	const handleClick = () => {
-		setTodo({ ...todo, completed: !todo.completed })
-	}
-
+	const [isLoading, setIsLoading] = useState(false)
 	const { enqueueSnackbar } = useSnackbar()
-
 	const [isEditing, setEditing] = useState<boolean>(false)
 	const [editTitle, setEditTitle] = useState<string>(todo.title)
 	const [editDescription, setEditDescription] = useState<string>(todo.description)
+
+	const handleClick = async (_id: string) => {
+		try {
+			setIsLoading(true)
+			const todoSwitchCompleted = {
+				completed: !todo.completed,
+			}
+			await patchTodo(_id, todoSwitchCompleted)
+			setTodo({ ...todo, completed: !todo.completed })
+			enqueueSnackbar(`Successfully`, { variant: 'success' })
+		} catch (error) {
+			console.log(error)
+			enqueueSnackbar(`God damn it`, { variant: 'error' })
+		} finally {
+			setIsLoading(false)
+		}
+	}
 
 	const handleEdit = () => {
 		setEditing(true)
@@ -56,38 +70,79 @@ export const Todo = ({ todo, setTodo }: TodoProps) => {
 		setEditDescription(event?.target.value)
 	}
 
-	const handleSave = () => {
+	const handleSave = async (_id: string) => {
 		const trimmedTitle = editTitle.trim()
 		const trimmedDescription = editDescription.trim()
-		if (!trimmedTitle) {
-			setTodo({ ...todo, title: todo.title, description: trimmedDescription, updatedAt: new Date().toISOString() })
-			setEditTitle(todo.title)
-			enqueueSnackbar(`The card was saved with the previous name because a card cannot be saved without a name`, {
-				variant: 'warning',
-			})
+		const notUpdatedTodo = trimmedTitle === todo.title && trimmedDescription === todo.description
+		console.log(notUpdatedTodo)
+		if (notUpdatedTodo) {
 			setEditing(false)
 			return
 		}
-		setTodo({ ...todo, title: trimmedTitle, description: trimmedDescription, updatedAt: new Date().toISOString() })
-		enqueueSnackbar(`Card: ${todo.title} saved successfully`, { variant: 'success' })
-		setEditing(false)
+		try {
+			setIsLoading(true)
+
+			const updateTodo = {
+				title: trimmedTitle,
+				description: trimmedDescription,
+			}
+			if (!trimmedTitle) {
+				await patchTodo(_id, updateTodo)
+				setTodo({ ...todo, title: todo.title, description: trimmedDescription })
+				setEditTitle(todo.title)
+				enqueueSnackbar(`The card was saved with the previous name because a card cannot be saved without a name`, {
+					variant: 'warning',
+				})
+				setEditing(false)
+				return
+			}
+			await patchTodo(_id, updateTodo)
+			setTodo({ ...todo, title: trimmedTitle, description: trimmedDescription })
+			enqueueSnackbar(`Card: ${todo.title} saved successfully`, { variant: 'success' })
+			setEditing(false)
+		} catch (error) {
+			console.log(error)
+			enqueueSnackbar(`Failed to change card`, { variant: 'error' })
+		} finally {
+			setIsLoading(false)
+		}
 	}
 
-	const handleDelete = (_id: string) => {
-		const result = todos.some((item) => item._id === _id)
-		if (!result) {
+	const handleDelete = async (_id: string) => {
+		try {
+			setIsLoading(true)
+			await deleteTodo(_id)
+			dispatch(deleteTodos(_id))
+			enqueueSnackbar(`Card: ${todo.title} - deleted`, { variant: 'success' })
+		} catch (error) {
+			console.error(error)
 			enqueueSnackbar(`Delete failed. Element not found.`, { variant: 'error' })
-			return
+		} finally {
+			setIsLoading(false)
 		}
-		dispatch(deleteTodos(_id))
-		enqueueSnackbar(`Card: ${todo.title} - deleted`, { variant: 'success' })
 	}
 
 	return (
-		<Card variant={'outlined'} sx={{ width: 250, display: 'flex', flexDirection: 'column', minHeight: 260 }}>
+		<Card
+			variant={'outlined'}
+			sx={{
+				width: 250,
+				display: 'flex',
+				flexDirection: 'column',
+				minHeight: 260,
+				position: 'relative',
+				overflow: 'hidden',
+			}}
+		>
+			<Backdrop
+				sx={{ color: '#fff', position: 'absolute', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+				open={isLoading}
+			>
+				<CircularProgress color="inherit" />
+			</Backdrop>
 			<CardContent sx={{ flexGrow: 1 }}>
 				{isEditing ? (
-					<ClickAwayListener onClickAway={handleSave}>
+					<ClickAwayListener onClickAway={() => handleSave(todo._id)}>
 						<Stack direction={'column'} spacing={1}>
 							<TextField value={editTitle} onChange={handleSetTitle} size={'small'} />
 							<TextField maxRows={2} value={editDescription} onChange={handleSetDescription} />
@@ -134,7 +189,7 @@ export const Todo = ({ todo, setTodo }: TodoProps) => {
 				</Stack>
 			</CardContent>
 			<CardActions sx={{ display: 'flex', justifyContent: 'space-between', mt: 'auto', minHeight: 50 }}>
-				<Checkbox checked={todo.completed} onClick={handleClick} />
+				<Checkbox checked={todo.completed} onClick={() => handleClick(todo._id)} />
 				<DeleteIcon sx={{ cursor: 'pointer' }} onClick={() => handleDelete(todo._id)} />
 			</CardActions>
 		</Card>

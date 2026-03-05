@@ -9,3 +9,9 @@ export type TodoType = {
 }
 
 export type CreateTodoType = Pick<TodoType, 'title' | 'description'>
+
+export type EditTodoType = {
+	title?: string
+	description?: string
+	completed?: boolean
+}
