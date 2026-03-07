@@ -7,7 +7,7 @@ import { enqueueSnackbar } from 'notistack'
 import { selectTodos, setTodos } from '../model/store/todosStore.ts'
 import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
 import { addTodo, getTodos } from '../api/todoApi.ts'
-import { selectUser } from '../../User/model/store/userStore.ts'
+import { selectTokenUser } from '../../User/model/store/selectors/selectTokenUser.tsx'
 
 const Todos = () => {
 	const [isLoading, setIsLoading] = useState(true)
@@ -15,8 +15,7 @@ const Todos = () => {
 	const [newTodoDescription, setNewTodoDescription] = useState<string>('')
 	const todos = useAppSelector(selectTodos)
 	const dispatch = useAppDispatch()
-	const user = useAppSelector(selectUser)
-	const token = user?.access_token
+	const token = useAppSelector(selectTokenUser)
 
 	const setTodoCompleted = (todo: TodoType) => {
 		const updatedTodos = todos.map((t) => {
@@ -29,17 +28,16 @@ const Todos = () => {
 	}
 
 	const handleGetTodos = useCallback(async () => {
-		getTodos()
-			.then((todos) => {
-				dispatch(setTodos(todos.data.reverse() || []))
-			})
-			.catch(() => {
-				enqueueSnackbar('Error fetching todos...', { variant: 'error' })
-				dispatch(setTodos([]))
-			})
-			.finally(() => {
-				setIsLoading(false)
-			})
+		setIsLoading(true)
+		try {
+			const result = await getTodos()
+			dispatch(setTodos(result.data.reverse() || []))
+		} catch (error) {
+			console.error(error)
+			enqueueSnackbar('Error fetching todos...', { variant: 'error' })
+			dispatch(setTodos([]))
+		}
+		setIsLoading(false)
 	}, [dispatch])
 
 	const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
