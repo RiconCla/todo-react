@@ -1,4 +1,4 @@
-import { format, formatDistanceToNow } from 'date-fns'
+import { formatDistanceToNow } from 'date-fns'
 import type { TodoType } from '../model/todoType.ts'
 import { useSnackbar } from 'notistack'
 import React, { type SetStateAction, useState } from 'react'
@@ -24,15 +24,6 @@ import LaunchIcon from '@mui/icons-material/Launch'
 type TodoProps = {
 	todo: TodoType
 	setTodo: (todo: TodoType) => void
-}
-
-const formatDate = (dateString: string | Date) => {
-	const date = new Date(dateString)
-
-	const time = format(date, 'HH:mm')
-	const datePart = format(date, 'dd.MM.yyyy')
-
-	return `${time}\n${datePart}`
 }
 
 export const Todo = React.memo(({ todo, setTodo }: TodoProps) => {
@@ -179,7 +170,7 @@ export const Todo = React.memo(({ todo, setTodo }: TodoProps) => {
 					<Typography variant="body1">
 						Created:{' '}
 						<Typography component="span" color="info">
-							{formatDate(todo.createdAt)}
+							{formatDistanceToNow(todo.createdAt)}
 						</Typography>
 					</Typography>
 					<Typography variant="body1">

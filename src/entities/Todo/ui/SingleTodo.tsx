@@ -68,7 +68,7 @@ const SingleTodo = () => {
 					<Typography variant={'h4'}>{todo.title}</Typography>
 					<Typography>{todo.description}</Typography>
 					<Typography>Last updated: {formatDistanceToNow(todo.updatedAt)}</Typography>
-					<Typography>Created: </Typography>
+					<Typography>Created:{formatDistanceToNow(todo.createdAt)} </Typography>
 					<Typography>{todo.completed ? 'Completed' : 'Incompeted'}</Typography>{' '}
 				</>
 			)}

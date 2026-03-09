@@ -13,8 +13,12 @@ import {
 	AccordionDetails,
 	AccordionSummary,
 	ButtonGroup,
+	Card,
 	Container,
+	Divider,
+	FormControl,
 	Input,
+	InputLabel,
 	MenuItem,
 	Paper,
 	Select,
@@ -25,6 +29,7 @@ import {
 import Button from '@mui/material/Button'
 import { useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
+import DehazeIcon from '@mui/icons-material/Dehaze'
 
 const TodosFilter = () => {
 	const filters = useAppSelector(selectFilters)
@@ -67,13 +72,19 @@ const TodosFilter = () => {
 		dispatch(setLimit(e.target.value))
 	}
 
+	const handleClearSearch = () => {
+		setTextSearch('')
+	}
+
 	const handlePrevClick = () => {
 		if (filters.page === 1) return
 		dispatch(setPage(filters.page - 1))
 	}
+
 	const handleNextClick = () => {
-		if (!hasNextPage) return
+		if (!hasNextPage) return true
 		dispatch(setPage(filters.page + 1))
+		return false
 	}
 
 	console.log(`dlina: ${todosLengths}`)
@@ -82,11 +93,25 @@ const TodosFilter = () => {
 	return (
 		<Container>
 			<Accordion>
-				<AccordionSummary>Filters</AccordionSummary>
+				<AccordionSummary sx={{ display: 'flex', gap: '200px' }}>
+					<DehazeIcon sx={{ alignSelf: 'center' }}></DehazeIcon>
+					<Typography sx={{ marginLeft: '20px' }} variant={'h5'}>
+						Filters
+					</Typography>
+				</AccordionSummary>
 				<AccordionDetails>
 					<Stack direction="row" sx={{ marginBottom: '20px' }}>
-						<Input onChange={handleChangeSearch} placeholder="Search..." value={textSearch} />
+						<Input
+							onChange={handleChangeSearch}
+							placeholder="Search..."
+							value={textSearch}
+							sx={{ marginRight: '10px' }}
+						/>
+						<Button variant={'outlined'} onClick={handleClearSearch}>
+							Clear
+						</Button>
 					</Stack>
+					<Divider sx={{ marginBottom: '20px' }} />
 					<ButtonGroup>
 						<Button
 							variant={filters.completed === 'true' ? 'contained' : 'outlined'}
@@ -107,31 +132,36 @@ const TodosFilter = () => {
 							Show All
 						</Button>
 					</ButtonGroup>
-					<Stack direction="row" sx={{ marginBottom: '20px' }}>
-						<Typography>Show by:</Typography>
-						<Select variant={'filled'} value={filters.limit} onChange={handleChangeLimit}>
+					<Divider sx={{ margin: '20px 20px' }} />
+					<FormControl size={'medium'} sx={{ width: '50%' }}>
+						<InputLabel id="choise-limit">Show by</InputLabel>
+						<Select
+							labelId="choise-limit"
+							id="choise-limit-select"
+							variant={'filled'}
+							value={filters.limit}
+							label="Show by"
+							onChange={handleChangeLimit}
+						>
 							<MenuItem value={5}>5</MenuItem>
 							<MenuItem value={10}>10</MenuItem>
 							<MenuItem value={20}>20</MenuItem>
 							<MenuItem value={25}>25</MenuItem>
 						</Select>
-					</Stack>
+					</FormControl>
 				</AccordionDetails>
 			</Accordion>
-			<ButtonGroup>
-				<Button onClick={handlePrevClick} disabled={filters.page === 1}>
-					Prev
-				</Button>
-				<Paper
-					sx={{ display: 'flex', minWidth: '50%', alignItems: 'center', justifyContent: 'center' }}
-					variant={'outlined'}
-				>
-					Page:{filters.page}
-				</Paper>
-				<Button onClick={handleNextClick} disabled={!hasNextPage}>
-					Next
-				</Button>
-			</ButtonGroup>
+			<Paper variant="elevation" sx={{ margin: '20px 0' }}>
+				<ButtonGroup>
+					<Button onClick={handlePrevClick} disabled={filters.page === 1}>
+						Prev
+					</Button>
+					<Card sx={{ margin: '10px 20px' }}>{filters.page}</Card>
+					<Button onClick={handleNextClick} disabled={!hasNextPage}>
+						Next
+					</Button>
+				</ButtonGroup>
+			</Paper>
 		</Container>
 	)
 }
