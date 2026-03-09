@@ -1,10 +1,10 @@
-import { Backdrop, CircularProgress, Container, Input, Stack, Typography } from '@mui/material'
+import { Backdrop, CircularProgress, Container, Input, Skeleton, Stack, Typography } from '@mui/material'
 import { Todo } from './Todo.tsx'
 import { useCallback, useEffect, useState } from 'react'
 import Button from '@mui/material/Button'
 import type { CreateTodoType, TodoType } from '../model/todoType.ts'
 import { enqueueSnackbar } from 'notistack'
-import { selectTodos, setTodos } from '../model/store/todosStore.ts'
+import { selectFilters, selectTodos, setTodos, setHasNextPage } from '../model/store/todosStore.ts'
 import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
 import { addTodo, getTodos } from '../api/todoApi.ts'
 import { selectTokenUser } from '../../User/model/store/selectors/selectTokenUser.tsx'
@@ -16,29 +16,40 @@ const Todos = () => {
 	const todos = useAppSelector(selectTodos)
 	const dispatch = useAppDispatch()
 	const token = useAppSelector(selectTokenUser)
+	const filters = useAppSelector(selectFilters)
 
-	const setTodoCompleted = (todo: TodoType) => {
-		const updatedTodos = todos.map((t) => {
-			if (t._id === todo._id) {
-				return todo
-			}
-			return t
-		})
-		dispatch(setTodos(updatedTodos))
-	}
+	const setTodoCompleted = useCallback(
+		(todo: TodoType) => {
+			const updatedTodos = todos.map((t) => {
+				if (t._id === todo._id) {
+					return todo
+				}
+				return t
+			})
+			dispatch(setTodos(updatedTodos))
+		},
+		[dispatch, todos]
+	)
 
 	const handleGetTodos = useCallback(async () => {
 		setIsLoading(true)
 		try {
-			const result = await getTodos()
-			dispatch(setTodos(result.data.reverse() || []))
+			const result = await getTodos(filters)
+			const allTodos = result.data.reverse()
+			const todosVisible = allTodos.slice(0, filters.limit).reverse()
+			const hasNextPage = todosVisible.length < allTodos.length
+
+			dispatch(setTodos(todosVisible || []))
+			dispatch(setHasNextPage(hasNextPage))
+			console.log(todosVisible)
 		} catch (error) {
 			console.error(error)
 			enqueueSnackbar('Error fetching todos...', { variant: 'error' })
 			dispatch(setTodos([]))
+			dispatch(setHasNextPage(false))
 		}
 		setIsLoading(false)
-	}, [dispatch])
+	}, [dispatch, filters])
 
 	const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setNewTodoTitle(e.target.value)
@@ -60,7 +71,6 @@ const Todos = () => {
 			setNewTodoTitle('')
 			setNewTodoDescription('')
 			await handleGetTodos()
-
 			enqueueSnackbar(`Card: ${newTodo.title} successfully added`, { variant: 'success' })
 		} catch (e) {
 			console.error(e)
@@ -88,11 +98,19 @@ const Todos = () => {
 						Add
 					</Button>
 				</Stack>
-				<Stack flexWrap={'wrap'} useFlexGap direction={'row'} gap={2} alignItems="stretch">
-					{todos.map((todo) => {
-						return <Todo todo={todo} key={todo._id} setTodo={setTodoCompleted} />
-					})}
-				</Stack>
+				{isLoading ? (
+					<Stack flexWrap={'wrap'} useFlexGap direction={'row'} gap={2} alignItems="stretch">
+						{Array.from({ length: filters.limit }).map((_, index) => {
+							return <Skeleton key={index} variant="rectangular" animation="wave" width={'250px'} height={'260px'} />
+						})}
+					</Stack>
+				) : (
+					<Stack flexWrap={'wrap'} useFlexGap direction={'row'} gap={2} alignItems="stretch">
+						{todos.map((todo) => {
+							return <Todo todo={todo} key={todo._id} setTodo={setTodoCompleted} />
+						})}
+					</Stack>
+				)}
 			</Container>
 		</>
 	)

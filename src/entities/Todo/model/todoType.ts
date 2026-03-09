@@ -15,3 +15,5 @@ export type EditTodoType = {
 	description?: string
 	completed?: boolean
 }
+
+export type TodoId = Pick<TodoType, '_id'>

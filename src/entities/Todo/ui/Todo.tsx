@@ -1,7 +1,7 @@
-import { format } from 'date-fns'
+import { format, formatDistanceToNow } from 'date-fns'
 import type { TodoType } from '../model/todoType.ts'
 import { useSnackbar } from 'notistack'
-import { type SetStateAction, useState } from 'react'
+import React, { type SetStateAction, useState } from 'react'
 import {
 	Backdrop,
 	Card,
@@ -18,6 +18,8 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { deleteTodos } from '../model/store/todosStore.ts'
 import { useAppDispatch } from '../../../app/store.ts'
 import { deleteTodo, patchTodo } from '../api/todoApi.ts'
+import { NavLink } from 'react-router'
+import LaunchIcon from '@mui/icons-material/Launch'
 
 type TodoProps = {
 	todo: TodoType
@@ -33,7 +35,7 @@ const formatDate = (dateString: string | Date) => {
 	return `${time}\n${datePart}`
 }
 
-export const Todo = ({ todo, setTodo }: TodoProps) => {
+export const Todo = React.memo(({ todo, setTodo }: TodoProps) => {
 	const dispatch = useAppDispatch()
 	const [isLoading, setIsLoading] = useState(false)
 	const { enqueueSnackbar } = useSnackbar()
@@ -183,15 +185,18 @@ export const Todo = ({ todo, setTodo }: TodoProps) => {
 					<Typography variant="body1">
 						Updated:{' '}
 						<Typography component="span" color="info">
-							{formatDate(todo.updatedAt)}
+							{formatDistanceToNow(todo.updatedAt)}
 						</Typography>
 					</Typography>
 				</Stack>
 			</CardContent>
 			<CardActions sx={{ display: 'flex', justifyContent: 'space-between', mt: 'auto', minHeight: 50 }}>
 				<Checkbox checked={todo.completed} onClick={() => handleClick(todo._id)} />
+				<NavLink style={{ margin: 0, display: 'flex', color: 'inherit' }} to={`/todos/${todo._id}`}>
+					<LaunchIcon sx={{ cursor: 'pointer' }} />
+				</NavLink>
 				<DeleteIcon sx={{ cursor: 'pointer' }} onClick={() => handleDelete(todo._id)} />
 			</CardActions>
 		</Card>
 	)
-}
+})
