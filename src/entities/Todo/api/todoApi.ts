@@ -3,7 +3,16 @@ import type { CreateTodoType, EditTodoType, TodoType } from '../model/todoType.t
 import type { TodosStore } from '../model/store/todosStore.ts'
 
 export const getTodos = async (filters: TodosStore['filters']) => {
-	let queryParams = `?page=${filters.page}&limit=${filters.limit + 1}`
+	let queryParams = ``
+
+	if (filters.page) {
+		queryParams += `?page=${filters.page}`
+	}
+
+	if (filters.limit) {
+		queryParams += `&limit=${filters.limit + 1}`
+	}
+
 	if (filters.completed !== 'all') {
 		queryParams += `&completed=${filters.completed}`
 	}

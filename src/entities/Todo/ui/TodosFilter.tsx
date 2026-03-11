@@ -4,6 +4,7 @@ import {
 	selectHasNextPage,
 	selectTodos,
 	setCompleted,
+	setHasNextPage,
 	setLimit,
 	setPage,
 	setSearch,
@@ -78,13 +79,22 @@ const TodosFilter = () => {
 
 	const handlePrevClick = () => {
 		if (filters.page === 1) return
-		dispatch(setPage(filters.page - 1))
+		dispatch(setPage((filters.page ?? 1) - 1))
 	}
 
 	const handleNextClick = () => {
 		if (!hasNextPage) return true
-		dispatch(setPage(filters.page + 1))
+		dispatch(setHasNextPage(true))
+		dispatch(setPage((filters.page ?? 1) + 1))
 		return false
+	}
+
+	const handleResetFilters = () => {
+		handleClearSearch()
+		dispatch(setPage(1))
+		dispatch(setCompleted('all'))
+		dispatch(setSearch(''))
+		dispatch(setLimit(5))
 	}
 
 	console.log(`dlina: ${todosLengths}`)
@@ -151,16 +161,34 @@ const TodosFilter = () => {
 					</FormControl>
 				</AccordionDetails>
 			</Accordion>
-			<Paper variant="elevation" sx={{ margin: '20px 0' }}>
-				<ButtonGroup>
-					<Button onClick={handlePrevClick} disabled={filters.page === 1}>
-						Prev
+			<Paper variant="elevation" sx={{ margin: '20px 0', padding: '10px 0' }}>
+				<Stack sx={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly' }}>
+					<ButtonGroup>
+						<Button onClick={handlePrevClick} disabled={filters.page === 1}>
+							Prev
+						</Button>
+						<Card sx={{ margin: '10px 20px' }}>{filters.page}</Card>
+						<Button onClick={handleNextClick} disabled={!hasNextPage}>
+							Next
+						</Button>
+					</ButtonGroup>
+				</Stack>
+				<Stack
+					sx={{
+						margin: '20px 0',
+						display: 'flex',
+						flexDirection: 'row',
+						gap: '50px',
+						justifyContent: 'center',
+					}}
+				>
+					<Button variant={'contained'} onClick={handleResetFilters}>
+						Reset filters
 					</Button>
-					<Card sx={{ margin: '10px 20px' }}>{filters.page}</Card>
-					<Button onClick={handleNextClick} disabled={!hasNextPage}>
-						Next
-					</Button>
-				</ButtonGroup>
+					<Typography variant={'button'} sx={{ alignSelf: 'center' }}>
+						Total: {todosLengths}{' '}
+					</Typography>
+				</Stack>
 			</Paper>
 		</Container>
 	)

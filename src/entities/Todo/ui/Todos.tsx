@@ -1,21 +1,19 @@
-import { Backdrop, CircularProgress, Container, Input, Skeleton, Stack, Typography } from '@mui/material'
+import { Backdrop, CircularProgress, Container, Skeleton, Stack } from '@mui/material'
 import { Todo } from './Todo.tsx'
 import { useCallback, useEffect, useState } from 'react'
-import Button from '@mui/material/Button'
-import type { CreateTodoType, TodoType } from '../model/todoType.ts'
+import type { TodoType } from '../model/todoType.ts'
 import { enqueueSnackbar } from 'notistack'
 import { selectFilters, selectTodos, setTodos, setHasNextPage } from '../model/store/todosStore.ts'
 import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
-import { addTodo, getTodos } from '../api/todoApi.ts'
-import { selectTokenUser } from '../../User/model/store/selectors/selectTokenUser.tsx'
+import { getTodos } from '../api/todoApi.ts'
+import AddTodo from './AddTodo.tsx'
 
 const Todos = () => {
 	const [isLoading, setIsLoading] = useState(true)
-	const [newTodoTitle, setNewTodoTitle] = useState<string>('')
-	const [newTodoDescription, setNewTodoDescription] = useState<string>('')
+
 	const todos = useAppSelector(selectTodos)
 	const dispatch = useAppDispatch()
-	const token = useAppSelector(selectTokenUser)
+
 	const filters = useAppSelector(selectFilters)
 
 	const setTodoCompleted = useCallback(
@@ -35,8 +33,10 @@ const Todos = () => {
 		setIsLoading(true)
 		try {
 			const result = await getTodos(filters)
-			const allTodos = result.data.reverse()
-			const todosVisible = allTodos.slice(0, filters.limit).reverse()
+			const allTodos = result.data
+			console.log(allTodos.length)
+
+			const todosVisible = allTodos.slice(0, filters.limit)
 			const hasNextPage = todosVisible.length < allTodos.length
 
 			dispatch(setTodos(todosVisible || []))
@@ -51,36 +51,8 @@ const Todos = () => {
 		setIsLoading(false)
 	}, [dispatch, filters])
 
-	const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setNewTodoTitle(e.target.value)
-	}
-
-	const handleDescriptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setNewTodoDescription(e.target.value)
-	}
-
-	const handleAddTodo = async () => {
-		try {
-			setIsLoading(true)
-			if (!token) return
-			const newTodo: CreateTodoType = {
-				title: newTodoTitle,
-				description: newTodoDescription,
-			}
-			await addTodo(newTodo)
-			setNewTodoTitle('')
-			setNewTodoDescription('')
-			await handleGetTodos()
-			enqueueSnackbar(`Card: ${newTodo.title} successfully added`, { variant: 'success' })
-		} catch (e) {
-			console.error(e)
-			enqueueSnackbar(`Error adding todo :(`, { variant: 'error' })
-		} finally {
-			setIsLoading(false)
-		}
-	}
-
 	useEffect(() => {
+		// eslint-disable-next-line react-hooks/set-state-in-effect
 		handleGetTodos()
 	}, [handleGetTodos])
 
@@ -90,14 +62,7 @@ const Todos = () => {
 				<CircularProgress color="inherit" />
 			</Backdrop>
 			<Container>
-				<Stack sx={{ marginBottom: '20px', display: 'flex', gap: '20px', maxWidth: '250px' }}>
-					<Typography variant={'h5'}>Create new Todo</Typography>
-					<Input placeholder={'title'} value={newTodoTitle} onChange={handleTitleChange} />
-					<Input placeholder={'description'} value={newTodoDescription} onChange={handleDescriptionChange} />
-					<Button variant="contained" disabled={!newTodoTitle} onClick={handleAddTodo}>
-						Add
-					</Button>
-				</Stack>
+				<AddTodo getTodos={handleGetTodos} />
 				{isLoading ? (
 					<Stack flexWrap={'wrap'} useFlexGap direction={'row'} gap={2} alignItems="stretch">
 						{Array.from({ length: filters.limit }).map((_, index) => {
