@@ -15,3 +15,11 @@ export type EditTodoType = {
 	description?: string
 	completed?: boolean
 }
+
+export type TodoId = Pick<TodoType, '_id'>
+
+export enum CompetedFilerStatus {
+	TRUE = 'true',
+	FALSE = 'false',
+	ALL = 'all',
+}
