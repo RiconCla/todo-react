@@ -1,7 +1,7 @@
 import { formatDistanceToNow } from 'date-fns'
 import type { TodoType } from '../model/todoType.ts'
 import { useSnackbar } from 'notistack'
-import React, { type SetStateAction, useState } from 'react'
+import { memo, type SetStateAction, useState } from 'react'
 import {
 	Backdrop,
 	Card,
@@ -26,7 +26,7 @@ type TodoProps = {
 	setTodo: (todo: TodoType) => void
 }
 
-export const Todo = React.memo(({ todo, setTodo }: TodoProps) => {
+export const Todo = memo(({ todo, setTodo }: TodoProps) => {
 	const dispatch = useAppDispatch()
 	const [isLoading, setIsLoading] = useState(false)
 	const { enqueueSnackbar } = useSnackbar()

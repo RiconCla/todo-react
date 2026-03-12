@@ -1,11 +1,11 @@
 import { type SetStateAction, useEffect, useState } from 'react'
-import { NavLink, type To, useParams } from 'react-router'
+import { useParams } from 'react-router'
 import { getTodoById, getTodos, patchTodo } from '../api/todoApi.ts'
 import type { TodoType } from '../model/todoType.ts'
-import { Backdrop, CardActions, CircularProgress, Container, Divider, Input, Stack, Typography } from '@mui/material'
+import { Backdrop, CircularProgress, Container, Typography } from '@mui/material'
 import Box from '@mui/material/Box'
-import { formatDistanceToNow } from 'date-fns'
-import Button from '@mui/material/Button'
+import SingleTodoContent from './SingleTodoContent.tsx'
+import { enqueueSnackbar } from 'notistack'
 
 const SingleTodo = () => {
 	const [todo, setTodo] = useState<TodoType>()
@@ -47,6 +47,23 @@ const SingleTodo = () => {
 			console.log(error)
 		}
 	}
+	const handleToggleComplete = async (paramsId: string) => {
+		if (!todo) return
+		try {
+			setIsLoading(true)
+			const todoSwitchCompleted = {
+				completed: !todo?.completed,
+			}
+			await patchTodo(paramsId, todoSwitchCompleted)
+			setTodo({ ...todo, completed: !todo.completed })
+			enqueueSnackbar(`Successfully`, { variant: 'success' })
+		} catch (error) {
+			console.log(error)
+			enqueueSnackbar(`God damn it`, { variant: 'error' })
+		} finally {
+			setIsLoading(false)
+		}
+	}
 
 	const handleClickToEditTodo = () => {
 		setEditTodo(true)
@@ -84,7 +101,6 @@ const SingleTodo = () => {
 			setEditTodo(false)
 			setIsLoading(false)
 		}
-		console.log(`sosi jopu`)
 	}
 
 	return (
@@ -109,48 +125,18 @@ const SingleTodo = () => {
 				>
 					<CircularProgress color="inherit" />
 				</Backdrop>
-
-				{isLoading && !todo ? (
-					<span>Loading...</span>
-				) : todo ? (
-					<>
-						<Stack sx={{ margin: '10px 0 10px' }}>
-							{editTodo ? (
-								<>
-									<Input value={title} onChange={handleChangeTitle} />
-									<Input value={description} onChange={handleChangeDescription} />
-								</>
-							) : (
-								<>
-									<Typography variant="h4">{todo.title}</Typography>
-									<Typography>{todo.description}</Typography>
-								</>
-							)}
-
-							<Typography>Last updated: {formatDistanceToNow(todo.updatedAt)}</Typography>
-							<Typography>Created: {formatDistanceToNow(todo.createdAt)}</Typography>
-							<Typography>{todo.completed ? 'Completed' : 'Incompleted'}</Typography>
-						</Stack>
-
-						<Divider />
-
-						<CardActions sx={{ padding: 0, margin: '10px 0 0', display: 'flex', gap: '20px' }}>
-							<NavLink style={{ display: 'flex', color: 'inherit', textDecoration: 'none' }} to={-1 as To}>
-								<Button variant="contained" sx={{ alignSelf: 'baseline' }}>
-									Back
-								</Button>
-							</NavLink>
-							<Button variant="contained" onClick={handleClickToEditTodo} disabled={editTodo}>
-								Edit
-							</Button>
-							<Button variant="contained" onClick={handleSave} disabled={!editTodo}>
-								Save
-							</Button>
-						</CardActions>
-					</>
-				) : (
-					<span>Oops empty...</span>
-				)}
+				<SingleTodoContent
+					isLoading={isLoading}
+					todo={todo}
+					editTodo={editTodo}
+					title={title}
+					description={description}
+					onChangeTitle={handleChangeTitle}
+					onChangeDescription={handleChangeDescription}
+					onEdit={handleClickToEditTodo}
+					onSave={handleSave}
+					onToggleStatus={handleToggleComplete}
+				/>
 			</Box>
 			<Container sx={{ padding: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
 				<Typography>Total todos: {allTodosCount}</Typography>

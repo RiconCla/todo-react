@@ -1,11 +1,11 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
-import type { TodoType } from '../todoType.ts'
+import { CompetedFilerStatus, type TodoType } from '../todoType.ts'
 
 export type TodosStore = {
 	todos: TodoType[]
 	hasNextPage: boolean
 	filters: {
-		completed: 'true' | 'false' | 'all'
+		completed: CompetedFilerStatus
 		page?: number
 		limit?: number
 		search?: string
@@ -18,7 +18,7 @@ const initialState: TodosStore = {
 	filters: {
 		limit: 5,
 		page: 1,
-		completed: 'all',
+		completed: CompetedFilerStatus.ALL,
 	},
 }
 
@@ -42,7 +42,7 @@ export const todosStore = createSlice({
 		setHasNextPage: (state, action: PayloadAction<boolean>) => {
 			state.hasNextPage = action.payload
 		},
-		setCompleted: (state, action: PayloadAction<'all' | 'true' | 'false'>) => {
+		setCompleted: (state, action: PayloadAction<CompetedFilerStatus>) => {
 			state.filters.completed = action.payload
 		},
 		setSearch: (state, action: PayloadAction<string>) => {

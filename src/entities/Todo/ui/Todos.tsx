@@ -18,12 +18,7 @@ const Todos = () => {
 
 	const setTodoCompleted = useCallback(
 		(todo: TodoType) => {
-			const updatedTodos = todos.map((t) => {
-				if (t._id === todo._id) {
-					return todo
-				}
-				return t
-			})
+			const updatedTodos = todos.map((t) => (t._id === todo._id ? todo : t))
 			dispatch(setTodos(updatedTodos))
 		},
 		[dispatch, todos]
@@ -34,14 +29,12 @@ const Todos = () => {
 		try {
 			const result = await getTodos(filters)
 			const allTodos = result.data
-			console.log(allTodos.length)
 
 			const todosVisible = allTodos.slice(0, filters.limit)
 			const hasNextPage = todosVisible.length < allTodos.length
 
 			dispatch(setTodos(todosVisible || []))
 			dispatch(setHasNextPage(hasNextPage))
-			console.log(todosVisible)
 		} catch (error) {
 			console.error(error)
 			enqueueSnackbar('Error fetching todos...', { variant: 'error' })
@@ -63,19 +56,14 @@ const Todos = () => {
 			</Backdrop>
 			<Container>
 				<AddTodo getTodos={handleGetTodos} />
-				{isLoading ? (
-					<Stack flexWrap={'wrap'} useFlexGap direction={'row'} gap={2} alignItems="stretch">
-						{Array.from({ length: filters.limit }).map((_, index) => {
-							return <Skeleton key={index} variant="rectangular" animation="wave" width={'250px'} height={'260px'} />
-						})}
-					</Stack>
-				) : (
-					<Stack flexWrap={'wrap'} useFlexGap direction={'row'} gap={2} alignItems="stretch">
-						{todos.map((todo) => {
-							return <Todo todo={todo} key={todo._id} setTodo={setTodoCompleted} />
-						})}
-					</Stack>
-				)}
+
+				<Stack flexWrap={'wrap'} useFlexGap direction={'row'} gap={2} alignItems="stretch">
+					{isLoading
+						? Array.from({ length: filters.limit ?? 5 }).map((_, index) => (
+								<Skeleton key={index} variant="rectangular" animation="wave" width={'250px'} height={'260px'} />
+							))
+						: todos.map((todo) => <Todo todo={todo} key={todo._id} setTodo={setTodoCompleted} />)}
+				</Stack>
 			</Container>
 		</>
 	)
