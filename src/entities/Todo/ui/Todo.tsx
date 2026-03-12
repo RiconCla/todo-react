@@ -67,7 +67,6 @@ export const Todo = memo(({ todo, setTodo }: TodoProps) => {
 		const trimmedTitle = editTitle.trim()
 		const trimmedDescription = editDescription.trim()
 		const notUpdatedTodo = trimmedTitle === todo.title && trimmedDescription === todo.description
-		console.log(notUpdatedTodo)
 		if (notUpdatedTodo) {
 			setEditing(false)
 			return

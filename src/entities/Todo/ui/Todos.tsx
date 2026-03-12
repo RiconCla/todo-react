@@ -29,10 +29,8 @@ const Todos = () => {
 		try {
 			const result = await getTodos(filters)
 			const allTodos = result.data
-
 			const todosVisible = allTodos.slice(0, filters.limit)
 			const hasNextPage = todosVisible.length < allTodos.length
-
 			dispatch(setTodos(todosVisible || []))
 			dispatch(setHasNextPage(hasNextPage))
 		} catch (error) {

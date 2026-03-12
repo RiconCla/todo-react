@@ -40,7 +40,6 @@ const TodosFilter = () => {
 	const [textSearch, setTextSearch] = useState(filters.search || '')
 	const hasNextPage = useAppSelector(selectHasNextPage)
 
-	console.log(filters.completed)
 	const handleFilterChange = (filter: CompetedFilerStatus) => {
 		dispatch(setCompleted(filter))
 	}
