@@ -1,7 +1,7 @@
 import { type SetStateAction, useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import { getTodoById, getTodos, patchTodo } from '../api/todoApi.ts'
-import type { TodoType } from '../model/todoType.ts'
+import { CompetedFilerStatus, type TodoType } from '../model/todoType.ts'
 import { Backdrop, CircularProgress, Container, Typography } from '@mui/material'
 import Box from '@mui/material/Box'
 import SingleTodoContent from './SingleTodoContent.tsx'
@@ -15,7 +15,7 @@ const SingleTodo = () => {
 	const [editTodo, setEditTodo] = useState<boolean>(false)
 	const [title, setTitle] = useState<string>('')
 	const [description, setDescription] = useState<string>('')
-	const filterToGetAllTodos = { completed: 'all' as const }
+	const filterToGetAllTodos = { completed: CompetedFilerStatus.ALL }
 	const [allTodosCount, setAllTodosCount] = useState<string | number>('Loading...')
 
 	useEffect(() => {
