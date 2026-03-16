@@ -23,10 +23,9 @@ import LaunchIcon from '@mui/icons-material/Launch'
 
 type TodoProps = {
 	todo: TodoType
-	setTodo: (todo: TodoType) => void
 }
 
-export const Todo = memo(({ todo, setTodo }: TodoProps) => {
+export const Todo = memo(({ todo }: TodoProps) => {
 	const dispatch = useAppDispatch()
 	const [isLoading, setIsLoading] = useState(false)
 	const { enqueueSnackbar } = useSnackbar()
