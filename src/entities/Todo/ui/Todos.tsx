@@ -9,7 +9,10 @@ import AddTodo from './AddTodo.tsx'
 
 const Todos = () => {
 	const filters = useAppSelector(selectFilters)
-	const { data, isLoading, isError, isFetching } = useGetTodosQuery(filters)
+	const { data, isLoading, isError, isFetching } = useGetTodosQuery(filters, {
+		pollingInterval: 10000,
+		skipPollingIfUnfocused: true,
+	})
 
 	useEffect(() => {
 		if (isError) {
