@@ -3,7 +3,6 @@ import { CompletedFilerStatus, type TodoType } from '../todoType.ts'
 
 export type TodosStore = {
 	todos: TodoType[]
-	hasNextPage: boolean
 	filters: {
 		completed: CompletedFilerStatus
 		page?: number
@@ -14,7 +13,6 @@ export type TodosStore = {
 
 const initialState: TodosStore = {
 	todos: [],
-	hasNextPage: false,
 	filters: {
 		limit: 5,
 		page: 1,
@@ -39,9 +37,6 @@ export const todosStore = createSlice({
 		setPage: (state, action: PayloadAction<number>) => {
 			state.filters.page = action.payload
 		},
-		setHasNextPage: (state, action: PayloadAction<boolean>) => {
-			state.hasNextPage = action.payload
-		},
 		setCompleted: (state, action: PayloadAction<CompletedFilerStatus>) => {
 			state.filters.completed = action.payload
 		},
@@ -52,11 +47,10 @@ export const todosStore = createSlice({
 	selectors: {
 		selectTodos: (state: TodosStore) => state.todos,
 		selectFilters: (state: TodosStore) => state.filters,
-		selectHasNextPage: (state: TodosStore) => state.hasNextPage,
 	},
 })
 
-export const { setTodos, deleteTodos, setLimit, setSearch, setPage, setCompleted, setHasNextPage } = todosStore.actions
-export const { selectTodos, selectFilters, selectHasNextPage } = todosStore.selectors
+export const { setTodos, deleteTodos, setLimit, setSearch, setPage, setCompleted } = todosStore.actions
+export const { selectTodos, selectFilters } = todosStore.selectors
 
 export default todosStore.reducer

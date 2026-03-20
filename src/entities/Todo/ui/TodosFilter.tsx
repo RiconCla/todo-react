@@ -1,14 +1,5 @@
 import { useAppDispatch, useAppSelector } from '../../../app/store.ts'
-import {
-	selectFilters,
-	selectHasNextPage,
-	selectTodos,
-	setCompleted,
-	setHasNextPage,
-	setLimit,
-	setPage,
-	setSearch,
-} from '../model/store/todosStore.ts'
+import { selectFilters, setCompleted, setLimit, setPage, setSearch } from '../model/store/todosStore.ts'
 import {
 	Accordion,
 	AccordionDetails,
@@ -32,14 +23,18 @@ import { useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import DehazeIcon from '@mui/icons-material/Dehaze'
 import { CompletedFilerStatus } from '../model/todoType.ts'
+import { useGetTodosQuery } from '../api/todoApi.ts'
 
 const TodosFilter = () => {
 	const filters = useAppSelector(selectFilters)
 	const dispatch = useAppDispatch()
-	const todosLengths = useAppSelector(selectTodos).length
 	const [textSearch, setTextSearch] = useState(filters.search || '')
-	const hasNextPage = useAppSelector(selectHasNextPage)
-
+	const { todosLength, hasNextPage } = useGetTodosQuery(filters, {
+		selectFromResult: ({ data }) => ({
+			todosLength: Math.min(data?.length ?? 0, filters.limit ?? 5),
+			hasNextPage: (data?.length ?? 0) > (filters.limit ?? 5),
+		}),
+	})
 	console.log(hasNextPage)
 
 	const handleFilterChange = (filter: CompletedFilerStatus) => {
@@ -88,8 +83,7 @@ const TodosFilter = () => {
 	}
 
 	const handleNextClick = () => {
-		if (hasNextPage) return true
-		dispatch(setHasNextPage(true))
+		if (!hasNextPage) return true
 		dispatch(setPage((filters.page ?? 1) + 1))
 		return false
 	}
@@ -101,8 +95,6 @@ const TodosFilter = () => {
 		dispatch(setSearch(''))
 		dispatch(setLimit(5))
 	}
-
-	console.log(filters.page)
 
 	return (
 		<Container>
@@ -172,7 +164,7 @@ const TodosFilter = () => {
 							Prev
 						</Button>
 						<Card sx={{ margin: '10px 20px' }}>{filters.page}</Card>
-						<Button onClick={handleNextClick} disabled={hasNextPage}>
+						<Button onClick={handleNextClick} disabled={!hasNextPage}>
 							Next
 						</Button>
 					</ButtonGroup>
@@ -190,7 +182,7 @@ const TodosFilter = () => {
 						Reset filters
 					</Button>
 					<Typography variant={'button'} sx={{ alignSelf: 'center' }}>
-						Total: {todosLengths}{' '}
+						Total: {todosLength}{' '}
 					</Typography>
 				</Stack>
 			</Paper>

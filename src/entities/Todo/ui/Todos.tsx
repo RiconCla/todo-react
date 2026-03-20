@@ -29,7 +29,7 @@ const Todos = () => {
 						? Array.from({ length: filters.limit ?? 5 }).map((_, index) => (
 								<Skeleton key={index} variant="rectangular" animation="wave" width={'250px'} height={'260px'} />
 							))
-						: data?.map((todo) => <Todo todo={todo} key={todo._id} />)}
+						: data?.slice(0, filters.limit).map((todo) => <Todo todo={todo} key={todo._id} />)}
 				</Stack>
 			</Container>
 		</>
