@@ -1,7 +1,7 @@
 import { type SetStateAction, useEffect, useState } from 'react'
 import { useParams } from 'react-router'
 import { useGetTodoQuery, useGetTodosQuery, usePatchTodoMutation } from '../api/todoApi.ts'
-import { CompletedFilerStatus } from '../model/todoType.ts'
+import { CompletedFilterStatus } from '../model/todoType.ts'
 import { Backdrop, CircularProgress, Container, Typography } from '@mui/material'
 import Box from '@mui/material/Box'
 import SingleTodoContent from './SingleTodoContent.tsx'
@@ -12,7 +12,7 @@ const SingleTodo = () => {
 	const params = useParams<{ _id: string }>()
 	const paramsId = params._id
 	const [editTodo, setEditTodo] = useState<boolean>(false)
-	const filterToGetAllTodos = { completed: CompletedFilerStatus.ALL }
+	const filterToGetAllTodos = { completed: CompletedFilterStatus.ALL }
 	const { data, isLoading } = useGetTodoQuery(paramsId ?? skipToken)
 	const { data: dataAllTodos, isLoading: isLoadingAllTodosLength } = useGetTodosQuery(filterToGetAllTodos)
 	const [title, setTitle] = useState<string>('')

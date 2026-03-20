@@ -22,7 +22,7 @@ import Button from '@mui/material/Button'
 import { useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import DehazeIcon from '@mui/icons-material/Dehaze'
-import { CompletedFilerStatus } from '../model/todoType.ts'
+import { CompletedFilterStatus } from '../model/todoType.ts'
 import { useGetTodosQuery } from '../api/todoApi.ts'
 
 const TodosFilter = () => {
@@ -36,7 +36,7 @@ const TodosFilter = () => {
 		}),
 	})
 
-	const handleFilterChange = (filter: CompletedFilerStatus) => {
+	const handleFilterChange = (filter: CompletedFilterStatus) => {
 		dispatch(setCompleted(filter))
 	}
 
@@ -90,7 +90,7 @@ const TodosFilter = () => {
 	const handleResetFilters = () => {
 		handleClearSearch()
 		dispatch(setPage(1))
-		dispatch(setCompleted(CompletedFilerStatus.ALL))
+		dispatch(setCompleted(CompletedFilterStatus.ALL))
 		dispatch(setSearch(''))
 		dispatch(setLimit(5))
 	}
@@ -120,19 +120,19 @@ const TodosFilter = () => {
 					<ButtonGroup>
 						<Button
 							variant={filters.completed === 'true' ? 'contained' : 'outlined'}
-							onClick={() => handleFilterChange(CompletedFilerStatus.TRUE)}
+							onClick={() => handleFilterChange(CompletedFilterStatus.TRUE)}
 						>
 							Completed
 						</Button>
 						<Button
 							variant={filters.completed === 'false' ? 'contained' : 'outlined'}
-							onClick={() => handleFilterChange(CompletedFilerStatus.FALSE)}
+							onClick={() => handleFilterChange(CompletedFilterStatus.FALSE)}
 						>
 							In Progress
 						</Button>
 						<Button
 							variant={filters.completed === 'all' ? 'contained' : 'outlined'}
-							onClick={() => handleFilterChange(CompletedFilerStatus.ALL)}
+							onClick={() => handleFilterChange(CompletedFilterStatus.ALL)}
 						>
 							Show All
 						</Button>

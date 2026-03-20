@@ -1,9 +1,9 @@
 import { createSlice, type PayloadAction } from '@reduxjs/toolkit'
-import { CompletedFilerStatus } from '../todoType.ts'
+import { CompletedFilterStatus } from '../todoType.ts'
 
 export type TodosStore = {
 	filters: {
-		completed: CompletedFilerStatus
+		completed: CompletedFilterStatus
 		page?: number
 		limit?: number
 		search?: string
@@ -14,7 +14,7 @@ const initialState: TodosStore = {
 	filters: {
 		limit: 5,
 		page: 1,
-		completed: CompletedFilerStatus.ALL,
+		completed: CompletedFilterStatus.ALL,
 	},
 }
 
@@ -29,7 +29,7 @@ export const todosStore = createSlice({
 		setPage: (state, action: PayloadAction<number>) => {
 			state.filters.page = action.payload
 		},
-		setCompleted: (state, action: PayloadAction<CompletedFilerStatus>) => {
+		setCompleted: (state, action: PayloadAction<CompletedFilterStatus>) => {
 			state.filters.completed = action.payload
 		},
 		setSearch: (state, action: PayloadAction<string>) => {

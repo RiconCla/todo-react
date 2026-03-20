@@ -1,6 +1,6 @@
 // Need to use the React-specific entry point to import createApi
 import { rtkApi } from '../../../shared/api/rtkApi.ts'
-import { CompletedFilerStatus, type CreateTodoType, type EditTodoType, type TodoType } from '../model/todoType.ts'
+import { CompletedFilterStatus, type CreateTodoType, type EditTodoType, type TodoType } from '../model/todoType.ts'
 import { type TodosStore } from '../model/store/todosStore.ts'
 
 const getQueryParams = (filters: TodosStore['filters']) => {
@@ -14,7 +14,7 @@ const getQueryParams = (filters: TodosStore['filters']) => {
 		queryParams += `&limit=${filters.limit + 1}`
 	}
 
-	if (filters.completed !== CompletedFilerStatus.ALL) {
+	if (filters.completed !== CompletedFilterStatus.ALL) {
 		queryParams += `&completed=${filters.completed}`
 	}
 	if (filters.search) {
