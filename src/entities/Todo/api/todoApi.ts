@@ -1,4 +1,3 @@
-import { rootApi } from '../../../shared/api/rootApi.ts'
 // Need to use the React-specific entry point to import createApi
 import { rtkApi } from '../../../shared/api/rtkApi.ts'
 import { CompletedFilerStatus, type CreateTodoType, type EditTodoType, type TodoType } from '../model/todoType.ts'
@@ -58,22 +57,6 @@ export const todoApiRTK = rtkApi.injectEndpoints({
 				method: `PATCH`,
 				body: todoEdit,
 			}),
-			async onQueryStarted({ id, todoEdit }, { dispatch, queryFulfilled }) {
-				const patchResult = dispatch(
-					rtkApi.util.updateQueryData('getTodos', undefined, (draft) => {
-						const todo = draft.find((t) => t._id === id)
-						if (todo) {
-							Object.assign(todo, todoEdit)
-						}
-					})
-				)
-
-				try {
-					await queryFulfilled
-				} catch {
-					patchResult.undo()
-				}
-			},
 			invalidatesTags: ['Todos', 'Todo'],
 		}),
 		getTodo: builder.query<TodoType, string>({

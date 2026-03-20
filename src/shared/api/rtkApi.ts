@@ -3,7 +3,7 @@ import type { RootState } from '../../app/store.ts'
 
 export const rtkApi = createApi({
 	reducerPath: 'rtkApi ',
-	tagTypes: ['Todos'],
+	tagTypes: ['Todos', 'Todo'],
 	baseQuery: fetchBaseQuery({
 		baseUrl: 'https://todos-be.vercel.app/',
 		prepareHeaders: (headers, { getState }) => {
