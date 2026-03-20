@@ -1,7 +1,7 @@
 import { formatDistanceToNow } from 'date-fns'
 import type { TodoType } from '../model/todoType.ts'
 import { useSnackbar } from 'notistack'
-import { memo, type SetStateAction, useState } from 'react'
+import { memo, type SetStateAction, useEffect, useState } from 'react'
 import {
 	Backdrop,
 	Card,
@@ -15,9 +15,7 @@ import {
 	Typography,
 } from '@mui/material'
 import DeleteIcon from '@mui/icons-material/Delete'
-import { deleteTodos } from '../model/store/todosStore.ts'
-import { useAppDispatch } from '../../../app/store.ts'
-import { deleteTodo, patchTodo } from '../api/todoApi.ts'
+import { useDeleteTodoMutation, usePatchTodoMutation } from '../api/todoApi.ts'
 import { NavLink } from 'react-router'
 import LaunchIcon from '@mui/icons-material/Launch'
 
@@ -25,29 +23,42 @@ type TodoProps = {
 	todo: TodoType
 }
 
-export const Todo = memo(({ todo }: TodoProps) => {
-	const dispatch = useAppDispatch()
-	const [isLoading, setIsLoading] = useState(false)
+const Todo = memo(({ todo }: TodoProps) => {
 	const { enqueueSnackbar } = useSnackbar()
 	const [isEditing, setEditing] = useState<boolean>(false)
 	const [editTitle, setEditTitle] = useState<string>(todo.title)
 	const [editDescription, setEditDescription] = useState<string>(todo.description)
 
-	const handleClick = async (_id: string) => {
-		try {
-			setIsLoading(true)
-			const todoSwitchCompleted = {
+	const [handleToggleComplete, { isLoading, isError: isErrorComplete, isSuccess: isSuccessComplete }] =
+		usePatchTodoMutation()
+
+	const [handleEditCard, { data, isLoading: isEditLoading, isError, isSuccess }] = usePatchTodoMutation()
+
+	const [handleToDelete, { isError: isErrorDelete, isSuccess: isSuccessDelete }] = useDeleteTodoMutation()
+
+	const handleClick = (id: string) => {
+		handleToggleComplete({
+			id: id,
+			todoEdit: {
 				completed: !todo.completed,
-			}
-			await patchTodo(_id, todoSwitchCompleted)
-			setTodo({ ...todo, completed: !todo.completed })
-			enqueueSnackbar(`Successfully`, { variant: 'success' })
-		} catch (error) {
-			console.log(error)
-			enqueueSnackbar(`God damn it`, { variant: 'error' })
-		} finally {
-			setIsLoading(false)
+			},
+		})
+	}
+
+	const handleDelete = (id: string) => {
+		handleToDelete(id)
+	}
+
+	const handleSave = (id: string) => {
+		const trimmedTitle = editTitle.trim()
+		const trimmedDescription = editDescription.trim()
+		const notUpdatedTodo = trimmedTitle === todo.title && trimmedDescription === todo.description && todo.completed
+		if (notUpdatedTodo) {
+			setEditing(false)
+			return
 		}
+		handleEditCard({ id, todoEdit: { title: trimmedTitle, description: trimmedDescription } })
+		setEditing(false)
 	}
 
 	const handleEdit = () => {
@@ -62,56 +73,32 @@ export const Todo = memo(({ todo }: TodoProps) => {
 		setEditDescription(event?.target.value)
 	}
 
-	const handleSave = async (_id: string) => {
-		const trimmedTitle = editTitle.trim()
-		const trimmedDescription = editDescription.trim()
-		const notUpdatedTodo = trimmedTitle === todo.title && trimmedDescription === todo.description
-		if (notUpdatedTodo) {
-			setEditing(false)
-			return
+	useEffect(() => {
+		if (isSuccessComplete) {
+			enqueueSnackbar(`Status updated successfully`, { variant: 'success' })
 		}
-		try {
-			setIsLoading(true)
+		if (isErrorComplete) {
+			enqueueSnackbar(`Failed to update status. Please try again`, { variant: 'error' })
+		}
+	}, [enqueueSnackbar, isSuccessComplete, isErrorComplete])
 
-			const updateTodo = {
-				title: trimmedTitle,
-				description: trimmedDescription,
-			}
-			if (!trimmedTitle) {
-				await patchTodo(_id, updateTodo)
-				setTodo({ ...todo, title: todo.title, description: trimmedDescription })
-				setEditTitle(todo.title)
-				enqueueSnackbar(`The card was saved with the previous name because a card cannot be saved without a name`, {
-					variant: 'warning',
-				})
-				setEditing(false)
-				return
-			}
-			await patchTodo(_id, updateTodo)
-			setTodo({ ...todo, title: trimmedTitle, description: trimmedDescription })
-			enqueueSnackbar(`Card: ${todo.title} saved successfully`, { variant: 'success' })
-			setEditing(false)
-		} catch (error) {
-			console.log(error)
+	useEffect(() => {
+		if (isSuccess) {
+			enqueueSnackbar(`Card: ${data.title} saved successfully`, { variant: 'success' })
+		}
+		if (isError) {
 			enqueueSnackbar(`Failed to change card`, { variant: 'error' })
-		} finally {
-			setIsLoading(false)
 		}
-	}
+	}, [data, enqueueSnackbar, isError, isSuccess])
 
-	const handleDelete = async (_id: string) => {
-		try {
-			setIsLoading(true)
-			await deleteTodo(_id)
-			dispatch(deleteTodos(_id))
+	useEffect(() => {
+		if (isSuccessDelete) {
 			enqueueSnackbar(`Card: ${todo.title} - deleted`, { variant: 'success' })
-		} catch (error) {
-			console.error(error)
-			enqueueSnackbar(`Delete failed. Element not found.`, { variant: 'error' })
-		} finally {
-			setIsLoading(false)
 		}
-	}
+		if (isErrorDelete) {
+			enqueueSnackbar(`Delete failed. Element not found.`, { variant: 'error' })
+		}
+	}, [enqueueSnackbar, isErrorDelete, isSuccessDelete, todo.title])
 
 	return (
 		<Card
@@ -127,7 +114,7 @@ export const Todo = memo(({ todo }: TodoProps) => {
 		>
 			<Backdrop
 				sx={{ color: '#fff', position: 'absolute', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-				open={isLoading}
+				open={isLoading || isEditLoading}
 			>
 				<CircularProgress color="inherit" />
 			</Backdrop>
@@ -189,3 +176,4 @@ export const Todo = memo(({ todo }: TodoProps) => {
 		</Card>
 	)
 })
+export default Todo

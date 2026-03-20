@@ -31,7 +31,7 @@ import Button from '@mui/material/Button'
 import { useState } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 import DehazeIcon from '@mui/icons-material/Dehaze'
-import { CompetedFilerStatus } from '../model/todoType.ts'
+import { CompletedFilerStatus } from '../model/todoType.ts'
 
 const TodosFilter = () => {
 	const filters = useAppSelector(selectFilters)
@@ -40,7 +40,9 @@ const TodosFilter = () => {
 	const [textSearch, setTextSearch] = useState(filters.search || '')
 	const hasNextPage = useAppSelector(selectHasNextPage)
 
-	const handleFilterChange = (filter: CompetedFilerStatus) => {
+	console.log(hasNextPage)
+
+	const handleFilterChange = (filter: CompletedFilerStatus) => {
 		dispatch(setCompleted(filter))
 	}
 
@@ -75,7 +77,9 @@ const TodosFilter = () => {
 	}
 
 	const handleClearSearch = () => {
+		debounceSearch.cancel()
 		setTextSearch('')
+		dispatch(setSearch(''))
 	}
 
 	const handlePrevClick = () => {
@@ -84,7 +88,7 @@ const TodosFilter = () => {
 	}
 
 	const handleNextClick = () => {
-		if (!hasNextPage) return true
+		if (hasNextPage) return true
 		dispatch(setHasNextPage(true))
 		dispatch(setPage((filters.page ?? 1) + 1))
 		return false
@@ -93,10 +97,12 @@ const TodosFilter = () => {
 	const handleResetFilters = () => {
 		handleClearSearch()
 		dispatch(setPage(1))
-		dispatch(setCompleted(CompetedFilerStatus.ALL))
+		dispatch(setCompleted(CompletedFilerStatus.ALL))
 		dispatch(setSearch(''))
 		dispatch(setLimit(5))
 	}
+
+	console.log(filters.page)
 
 	return (
 		<Container>
@@ -123,19 +129,19 @@ const TodosFilter = () => {
 					<ButtonGroup>
 						<Button
 							variant={filters.completed === 'true' ? 'contained' : 'outlined'}
-							onClick={() => handleFilterChange(CompetedFilerStatus.TRUE)}
+							onClick={() => handleFilterChange(CompletedFilerStatus.TRUE)}
 						>
 							Completed
 						</Button>
 						<Button
 							variant={filters.completed === 'false' ? 'contained' : 'outlined'}
-							onClick={() => handleFilterChange(CompetedFilerStatus.FALSE)}
+							onClick={() => handleFilterChange(CompletedFilerStatus.FALSE)}
 						>
 							In Progress
 						</Button>
 						<Button
 							variant={filters.completed === 'all' ? 'contained' : 'outlined'}
-							onClick={() => handleFilterChange(CompetedFilerStatus.ALL)}
+							onClick={() => handleFilterChange(CompletedFilerStatus.ALL)}
 						>
 							Show All
 						</Button>
@@ -166,7 +172,7 @@ const TodosFilter = () => {
 							Prev
 						</Button>
 						<Card sx={{ margin: '10px 20px' }}>{filters.page}</Card>
-						<Button onClick={handleNextClick} disabled={!hasNextPage}>
+						<Button onClick={handleNextClick} disabled={hasNextPage}>
 							Next
 						</Button>
 					</ButtonGroup>

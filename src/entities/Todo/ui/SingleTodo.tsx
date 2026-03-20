@@ -1,71 +1,60 @@
 import { type SetStateAction, useEffect, useState } from 'react'
 import { useParams } from 'react-router'
-import { getTodoById, getTodos, patchTodo } from '../api/todoApi.ts'
-import { CompetedFilerStatus, type TodoType } from '../model/todoType.ts'
+import { useGetTodoQuery, useGetTodosQuery, usePatchTodoMutation } from '../api/todoApi.ts'
+import { CompletedFilerStatus } from '../model/todoType.ts'
 import { Backdrop, CircularProgress, Container, Typography } from '@mui/material'
 import Box from '@mui/material/Box'
 import SingleTodoContent from './SingleTodoContent.tsx'
 import { enqueueSnackbar } from 'notistack'
+import { skipToken } from '@reduxjs/toolkit/query'
 
 const SingleTodo = () => {
-	const [todo, setTodo] = useState<TodoType>()
-	const [isLoading, setIsLoading] = useState(false)
 	const params = useParams<{ _id: string }>()
 	const paramsId = params._id
 	const [editTodo, setEditTodo] = useState<boolean>(false)
+	const filterToGetAllTodos = { completed: CompletedFilerStatus.ALL }
+	const { data, isLoading } = useGetTodoQuery(paramsId ?? skipToken)
+	const { data: dataAllTodos, isLoading: isLoadingAllTodosLength } = useGetTodosQuery(filterToGetAllTodos)
 	const [title, setTitle] = useState<string>('')
 	const [description, setDescription] = useState<string>('')
-	const filterToGetAllTodos = { completed: CompetedFilerStatus.ALL }
-	const [allTodosCount, setAllTodosCount] = useState<string | number>('Loading...')
+	const [handleEditTodo, { data: dataTodo, isLoading: isEditLoading, isError, isSuccess }] = usePatchTodoMutation()
+	const [
+		handleToggleComplete,
+		{ isLoading: isLoadingComplete, isError: isErrorComplete, isSuccess: isSuccessComplete },
+	] = usePatchTodoMutation()
 
 	useEffect(() => {
-		getInfoByTodo()
-		getAllTodosLength()
-	}, [paramsId])
+		if (isSuccessComplete) {
+			enqueueSnackbar(`Status updated successfully`, { variant: 'success' })
+		}
+		if (isErrorComplete) {
+			enqueueSnackbar(`Failed to update status. Please try again`, { variant: 'error' })
+		}
+	}, [isErrorComplete, isSuccessComplete])
 
-	const getInfoByTodo = async () => {
-		if (!paramsId) return
-		try {
-			setIsLoading(true)
-			const result = await getTodoById(paramsId)
-			setTodo(result.data)
-			setTitle(result.data.title)
-			setDescription(result.data.description)
-		} catch (error) {
-			console.log(error)
-		} finally {
-			setIsLoading(false)
+	useEffect(() => {
+		if (isSuccess) {
+			enqueueSnackbar(`Card: ${dataTodo.title} saved successfully`, { variant: 'success' })
 		}
-	}
+		if (isError) {
+			enqueueSnackbar(`Failed to change card`, { variant: 'error' })
+		}
+	}, [data, enqueueSnackbar, isError, isSuccess])
 
-	const getAllTodosLength = async () => {
-		if (!paramsId) return
-		try {
-			const result = await getTodos(filterToGetAllTodos)
-			setAllTodosCount(result.data.length)
-		} catch (error) {
-			console.log(error)
-		}
-	}
-	const handleToggleComplete = async (paramsId: string) => {
-		if (!todo) return
-		try {
-			setIsLoading(true)
-			const todoSwitchCompleted = {
-				completed: !todo?.completed,
-			}
-			await patchTodo(paramsId, todoSwitchCompleted)
-			setTodo({ ...todo, completed: !todo.completed })
-			enqueueSnackbar(`Successfully`, { variant: 'success' })
-		} catch (error) {
-			console.log(error)
-			enqueueSnackbar(`God damn it`, { variant: 'error' })
-		} finally {
-			setIsLoading(false)
-		}
+	if (!paramsId) return null
+
+	const handleClickToggleComplete = (id: string) => {
+		handleToggleComplete({
+			id: id,
+			todoEdit: {
+				completed: !data?.completed,
+			},
+		})
 	}
 
 	const handleClickToEditTodo = () => {
+		setTitle(data?.title ?? '')
+		setDescription(data?.description ?? '')
 		setEditTodo(true)
 	}
 
@@ -77,30 +66,16 @@ const SingleTodo = () => {
 		setDescription(event.target.value)
 	}
 
-	const handleSave = async () => {
-		if (!todo || !paramsId) return
+	const handleSave = (id: string) => {
 		const trimmedTitle = title.trim()
 		const trimmedDescription = description.trim()
-		const newTodo = {
-			title: trimmedTitle,
-			description: trimmedDescription,
-		}
-		const notUpdatedTodo = trimmedTitle === todo.title && trimmedDescription === todo.description
+		const notUpdatedTodo = trimmedTitle === data?.title && trimmedDescription === data?.description && data?.completed
 		if (notUpdatedTodo) {
 			setEditTodo(false)
 			return
 		}
-		try {
-			setIsLoading(true)
-			const result = await patchTodo(paramsId, newTodo)
-			setTodo({ ...todo, title: result.data.title, description: result.data.description })
-			getInfoByTodo()
-		} catch (error) {
-			console.log(error)
-		} finally {
-			setEditTodo(false)
-			setIsLoading(false)
-		}
+		handleEditTodo({ id, todoEdit: { title: trimmedTitle, description: trimmedDescription } })
+		setEditTodo(false)
 	}
 
 	return (
@@ -121,25 +96,25 @@ const SingleTodo = () => {
 			>
 				<Backdrop
 					sx={{ color: '#fff', position: 'absolute', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-					open={isLoading}
+					open={isLoading || isEditLoading}
 				>
 					<CircularProgress color="inherit" />
 				</Backdrop>
 				<SingleTodoContent
-					isLoading={isLoading}
-					todo={todo}
+					isLoading={isLoading || isLoadingComplete}
+					todo={data}
 					editTodo={editTodo}
 					title={title}
 					description={description}
 					onChangeTitle={handleChangeTitle}
 					onChangeDescription={handleChangeDescription}
 					onEdit={handleClickToEditTodo}
-					onSave={handleSave}
-					onToggleStatus={handleToggleComplete}
+					onSave={() => handleSave(paramsId)}
+					onToggleStatus={handleClickToggleComplete}
 				/>
 			</Box>
 			<Container sx={{ padding: '20px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-				<Typography>Total todos: {allTodosCount}</Typography>
+				<Typography>Total todos: {isLoadingAllTodosLength ? 'Loaging...' : (dataAllTodos?.length ?? 0)}</Typography>
 			</Container>
 		</>
 	)

@@ -1,8 +1,10 @@
 import { rootApi } from '../../../shared/api/rootApi.ts'
-import type { CreateTodoType, EditTodoType, TodoType } from '../model/todoType.ts'
-import type { TodosStore } from '../model/store/todosStore.ts'
+// Need to use the React-specific entry point to import createApi
+import { rtkApi } from '../../../shared/api/rtkApi.ts'
+import { CompletedFilerStatus, type CreateTodoType, type EditTodoType, type TodoType } from '../model/todoType.ts'
+import { type TodosStore } from '../model/store/todosStore.ts'
 
-export const getTodos = async (filters: TodosStore['filters']) => {
+const getQueryParams = (filters: TodosStore['filters']) => {
 	let queryParams = ``
 
 	if (filters.page) {
@@ -13,51 +15,27 @@ export const getTodos = async (filters: TodosStore['filters']) => {
 		queryParams += `&limit=${filters.limit + 1}`
 	}
 
-	if (filters.completed !== 'all') {
+	if (filters.completed !== CompletedFilerStatus.ALL) {
 		queryParams += `&completed=${filters.completed}`
 	}
 	if (filters.search) {
 		queryParams += `&search=${filters.search}`
 	}
-	return await rootApi.get<TodoType[]>(`/todos/${queryParams}`)
+	return queryParams
 }
-
-export const addTodo = async (todo: CreateTodoType) => {
-	return await rootApi.post<TodoType>('/todos', todo)
-}
-
-export const deleteTodo = async (TodoId: string) => {
-	return await rootApi.delete(`todos/${TodoId}`)
-}
-
-export const patchTodo = async (TodoId: string, todo: EditTodoType) => {
-	return await rootApi.patch(`todos/${TodoId}`, todo)
-}
-
-export const getTodoById = async (TodoId: string) => {
-	return await rootApi.get<TodoType>(`todos/${TodoId}`)
-}
-
-// Need to use the React-specific entry point to import createApi
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import type { RootState } from '../../../app/store.ts'
 
 // Define a service using a base URL and expected endpoints
-export const todoApiRTK = createApi({
-	reducerPath: 'todoApiRTK ',
-	baseQuery: fetchBaseQuery({
-		baseUrl: 'https://todos-be.vercel.app/',
-		prepareHeaders: (headers, { getState }) => {
-			const token = (getState() as RootState).userSlice.user?.access_token
-			if (token) {
-				headers.set('authorization', `Bearer ${token}`)
-			}
-			return headers
-		},
-	}),
+export const todoApiRTK = rtkApi.injectEndpoints({
 	endpoints: (builder) => ({
-		getTodos: builder.query<TodoType[], void>({
-			query: () => `/todos/`,
+		getTodos: builder.query<TodoType[], TodosStore['filters']>({
+			query: (filters) => {
+				const queryParams = getQueryParams(filters)
+				return `/todos${queryParams}`
+			},
+			transformResponse: (baseQueryReturnValue: TodoType[]): TodoType[] => {
+				return [...baseQueryReturnValue].reverse()
+			},
+			providesTags: ['Todos'],
 		}),
 		addTodo: builder.mutation<TodoType, CreateTodoType>({
 			query: (todo) => ({
@@ -65,10 +43,49 @@ export const todoApiRTK = createApi({
 				method: `POST`,
 				body: todo,
 			}),
+			invalidatesTags: ['Todos'],
+		}),
+		deleteTodo: builder.mutation<void, string>({
+			query: (id) => ({
+				url: `/todos/${id}`,
+				method: `DELETE`,
+			}),
+			invalidatesTags: ['Todos'],
+		}),
+		patchTodo: builder.mutation<TodoType, { id: string; todoEdit: EditTodoType }>({
+			query: ({ id, todoEdit }) => ({
+				url: `/todos/${id}`,
+				method: `PATCH`,
+				body: todoEdit,
+			}),
+			async onQueryStarted({ id, todoEdit }, { dispatch, queryFulfilled }) {
+				const patchResult = dispatch(
+					rtkApi.util.updateQueryData('getTodos', undefined, (draft) => {
+						const todo = draft.find((t) => t._id === id)
+						if (todo) {
+							Object.assign(todo, todoEdit)
+						}
+					})
+				)
+
+				try {
+					await queryFulfilled
+				} catch {
+					patchResult.undo()
+				}
+			},
+			invalidatesTags: ['Todos', 'Todo'],
+		}),
+		getTodo: builder.query<TodoType, string>({
+			query: (id) => ({
+				url: `/todos/${id}`,
+			}),
+			providesTags: ['Todo'],
 		}),
 	}),
 })
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useGetTodosQuery, useAddTodoMutation } = todoApiRTK
+export const { useGetTodosQuery, useAddTodoMutation, usePatchTodoMutation, useGetTodoQuery, useDeleteTodoMutation } =
+	todoApiRTK

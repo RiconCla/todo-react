@@ -18,7 +18,7 @@ export type EditTodoType = {
 
 export type TodoId = Pick<TodoType, '_id'>
 
-export enum CompetedFilerStatus {
+export enum CompletedFilerStatus {
 	TRUE = 'true',
 	FALSE = 'false',
 	ALL = 'all',
