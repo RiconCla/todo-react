@@ -35,7 +35,6 @@ const TodosFilter = () => {
 			hasNextPage: (data?.length ?? 0) > (filters.limit ?? 5),
 		}),
 	})
-	console.log(hasNextPage)
 
 	const handleFilterChange = (filter: CompletedFilerStatus) => {
 		dispatch(setCompleted(filter))
