@@ -4,14 +4,18 @@ import { useDispatch, useSelector } from 'react-redux'
 import { todosStore } from '../entities/Todo/model/store/todosStore.ts'
 import { accordionItemsStore } from '../entities/Accordion/model/store/accordionItemsStore.ts'
 import { accordionStateStore } from '../entities/Accordion/model/store/accordionStore.ts'
+import { todoApiRTK } from '../entities/Todo/api/todoApi.ts'
+import { rtkApi } from '../shared/api/rtkApi.ts'
 
 export const store = configureStore({
 	reducer: {
 		userSlice: userStore.reducer,
 		todosSlice: todosStore.reducer,
+		[rtkApi.reducerPath]: todoApiRTK.reducer,
 		accordionItemsSlice: accordionItemsStore.reducer,
 		accordionStateSlice: accordionStateStore.reducer,
 	},
+	middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(todoApiRTK.middleware),
 })
 
 export type RootState = ReturnType<typeof store.getState>

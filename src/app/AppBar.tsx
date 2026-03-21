@@ -23,9 +23,9 @@ import { removerUser, selectUser, setUser } from '../entities/User/model/store/u
 import { autoLogin } from '../shared/util/autoLogin.ts'
 import { useAppDispatch, useAppSelector } from './store.ts'
 import { useEffect } from 'react'
-import { selectUnDoneTodosLength } from '../entities/Todo/model/store/selectors/selectUnDoneTodos.ts'
 import { NavLink, useLocation, useNavigate } from 'react-router'
-import { selectDoneTodosLength } from '../entities/Todo/model/store/selectors/selectDoneTodos.tsx'
+import { useGetTodosQuery } from '../entities/Todo/api/todoApi.ts'
+import { selectFilters } from '../entities/Todo/model/store/todosStore.ts'
 import Acordion from '../entities/Accordion/ui/acordion.tsx'
 import { selectAccordionState, toggleAccordion } from '../entities/Accordion/model/store/accordionStore.ts'
 
@@ -36,8 +36,13 @@ type Props = {
 
 const ButtonAppBar = ({ username }: Props) => {
 	const { mode, setMode } = useColorScheme()
-	const unDoneTodosLength = useAppSelector(selectUnDoneTodosLength)
-	const doneTodosLength = useAppSelector(selectDoneTodosLength)
+	const filters = useAppSelector(selectFilters)
+	const { unDoneCount, doneCount } = useGetTodosQuery(filters, {
+		selectFromResult: ({ data }) => ({
+			unDoneCount: data?.filter((todo) => !todo.completed).length ?? 0,
+			doneCount: data?.filter((todo) => todo.completed).length ?? 0,
+		}),
+	})
 
 	const user = useAppSelector(selectUser)
 	const dispatch = useAppDispatch()
@@ -180,10 +185,10 @@ const ButtonAppBar = ({ username }: Props) => {
 						{username && (
 							<Stack direction={'row'} spacing={2}>
 								<Typography variant="h6" component="div">
-									Incomplete{': ' + unDoneTodosLength}
+									Incomplete{': ' + unDoneCount}
 								</Typography>
 								<Typography variant="h6" component="div">
-									Completed{': ' + doneTodosLength}
+									Completed{': ' + doneCount}
 								</Typography>
 								<Typography variant="h6" component="div">
 									<NavLink to={isAboutPage ? '/' : '/about'}>
