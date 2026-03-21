@@ -1,7 +1,6 @@
 import { formatDistanceToNow } from 'date-fns'
 import type { TodoType } from '../model/todoType.ts'
-import { useSnackbar } from 'notistack'
-import { memo, type SetStateAction, useEffect, useState } from 'react'
+import { memo, type SetStateAction, useState } from 'react'
 import {
 	Backdrop,
 	Card,
@@ -18,13 +17,13 @@ import DeleteIcon from '@mui/icons-material/Delete'
 import { useDeleteTodoMutation, usePatchTodoMutation } from '../api/todoApi.ts'
 import { NavLink } from 'react-router'
 import LaunchIcon from '@mui/icons-material/Launch'
+import useEnqueueSnackbar from '../lib/useEnqueueSnackbar.tsx'
 
 type TodoProps = {
 	todo: TodoType
 }
 
 const Todo = memo(({ todo }: TodoProps) => {
-	const { enqueueSnackbar } = useSnackbar()
 	const [isEditing, setEditing] = useState<boolean>(false)
 	const [editTitle, setEditTitle] = useState<string>(todo.title)
 	const [editDescription, setEditDescription] = useState<string>(todo.description)
@@ -73,32 +72,14 @@ const Todo = memo(({ todo }: TodoProps) => {
 		setEditDescription(event?.target.value)
 	}
 
-	useEffect(() => {
-		if (isSuccessComplete) {
-			enqueueSnackbar(`Status updated successfully`, { variant: 'success' })
-		}
-		if (isErrorComplete) {
-			enqueueSnackbar(`Failed to update status. Please try again`, { variant: 'error' })
-		}
-	}, [enqueueSnackbar, isSuccessComplete, isErrorComplete])
+	useEnqueueSnackbar(`Status updated successfully`, isSuccessComplete, true)
+	useEnqueueSnackbar(`Failed to update status. Please try again`, isErrorComplete, false)
 
-	useEffect(() => {
-		if (isSuccess) {
-			enqueueSnackbar(`Card: ${data.title} saved successfully`, { variant: 'success' })
-		}
-		if (isError) {
-			enqueueSnackbar(`Failed to change card`, { variant: 'error' })
-		}
-	}, [data, enqueueSnackbar, isError, isSuccess])
+	useEnqueueSnackbar(`Card: ${todo.title} - deleted`, isSuccessDelete, true)
+	useEnqueueSnackbar(`Delete failed. Element not found.`, isErrorDelete, false)
 
-	useEffect(() => {
-		if (isSuccessDelete) {
-			enqueueSnackbar(`Card: ${todo.title} - deleted`, { variant: 'success' })
-		}
-		if (isErrorDelete) {
-			enqueueSnackbar(`Delete failed. Element not found.`, { variant: 'error' })
-		}
-	}, [enqueueSnackbar, isErrorDelete, isSuccessDelete, todo.title])
+	useEnqueueSnackbar(`Card: ${data?.title} saved successfully`, isSuccess, true)
+	useEnqueueSnackbar(`Failed to change card`, isError, false)
 
 	return (
 		<Card
