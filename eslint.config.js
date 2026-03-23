@@ -7,7 +7,7 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 import eslintConfigPrettier from 'eslint-config-prettier/flat'
 
 export default defineConfig([
-	globalIgnores(['dist', 'public']),
+	globalIgnores(['dist', 'public', 'storybook - static']),
 	{
 		files: ['**/*.{ts,tsx}'],
 		extends: [
