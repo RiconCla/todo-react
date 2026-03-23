@@ -32,7 +32,7 @@ const TodosFilter = () => {
 	const { todosLength, hasNextPage } = useGetTodosQuery(filters, {
 		selectFromResult: ({ data }) => ({
 			todosLength: Math.min(data?.length ?? 0, filters.limit ?? 5),
-			hasNextPage: (data?.length ?? 0) > (filters.limit ?? 5),
+			hasNextPage: (data?.length ?? 0) >= (filters.limit ?? 5),
 		}),
 	})
 

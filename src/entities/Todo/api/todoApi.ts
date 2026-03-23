@@ -11,7 +11,7 @@ const getQueryParams = (filters: TodosStore['filters']) => {
 	}
 
 	if (filters.limit) {
-		queryParams += `&limit=${filters.limit + 1}`
+		queryParams += `&limit=${filters.limit}`
 	}
 
 	if (filters.completed !== CompletedFilterStatus.ALL) {
