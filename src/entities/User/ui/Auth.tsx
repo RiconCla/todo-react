@@ -21,8 +21,12 @@ type SignUpFormInputs = z.infer<typeof stringSchemaRegister>
 type SignInFormInputs = z.infer<typeof stringSchemaLogin>
 const stringSchemaRegister = z
 	.object({
-		userName: z.string().max(10, { message: 'Name so long. Max length 10 symbols' }),
-		userPassword: z.string().min(3, { message: 'Password must be at least 3 characters' }),
+		userName: z.string().max(10, { message: 'Name so long. Max length 10 symbols' }).trim(),
+		userPassword: z
+			.string()
+			.min(3, { message: 'Password must be at least 3 characters' })
+			.nonempty({ message: 'The password cannot be empty' })
+			.regex(/^[a-zA-Z0-9.*+?^${}()|[\]\\-]+$/, { message: 'The string contains disallowed characters' }),
 		confermedPassword: z.string(), //схема валидаций
 	})
 	.refine((data) => data.userPassword === data.confermedPassword, {
@@ -31,7 +35,7 @@ const stringSchemaRegister = z
 	})
 
 const stringSchemaLogin = z.object({
-	userName: z.string().max(10, { message: 'Name so long. Max length 10 symbols' }),
+	userName: z.string().max(10, { message: 'Name so long. Max length 10 symbols' }).trim(),
 	userPassword: z.string().min(5, { message: 'Password must be at least 5 characters' }),
 })
 
@@ -101,7 +105,7 @@ const Auth = () => {
 					>
 						<Stack direction={'column'} spacing={2}>
 							<TextField
-								disabled={loading ? true : false}
+								disabled={loading}
 								id="filled-email-input"
 								label="name"
 								variant="filled"
@@ -119,7 +123,7 @@ const Auth = () => {
 								}}
 							/>
 							<TextField
-								disabled={loading ? true : false}
+								disabled={loading}
 								id="filled-password-input"
 								label="password"
 								type="password"
@@ -157,14 +161,13 @@ const Auth = () => {
 					>
 						<Stack direction={'column'} spacing={2}>
 							<TextField
-								disabled={loading ? true : false}
+								disabled={loading}
 								id="filled-email-input"
 								label="name"
 								variant="filled"
 								{...register('userName')}
 								error={!!errors?.userName}
 								helperText={errors ? errors.userName?.message : ''}
-								// onChange={handleUserNameChange}
 								slotProps={{
 									input: {
 										startAdornment: (
@@ -176,7 +179,7 @@ const Auth = () => {
 								}}
 							/>
 							<TextField
-								disabled={loading ? true : false}
+								disabled={loading}
 								id="filled-password-input"
 								label="password"
 								type="password"
@@ -195,7 +198,7 @@ const Auth = () => {
 								}}
 							/>
 							<TextField
-								disabled={loading ? true : false}
+								disabled={loading}
 								id="filled-password-input"
 								label="Confermed password"
 								type="password"
