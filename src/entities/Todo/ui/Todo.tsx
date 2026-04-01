@@ -18,13 +18,14 @@ import { useDeleteTodoMutation, usePatchTodoMutation } from '../api/todoApi.ts'
 import { NavLink } from 'react-router'
 import LaunchIcon from '@mui/icons-material/Launch'
 import useEnqueueSnackbar from '../lib/useEnqueueSnackbar.tsx'
+import useToggleEdit from '../lib/useToggleEdit.tsx'
 
 type TodoProps = {
 	todo: TodoType
 }
 
 const Todo = memo(({ todo }: TodoProps) => {
-	const [isEditing, setEditing] = useState<boolean>(false)
+	const [isEditing, setEdit, setNotEdit] = useToggleEdit()
 	const [editTitle, setEditTitle] = useState<string>(todo.title)
 	const [editDescription, setEditDescription] = useState<string>(todo.description)
 
@@ -53,15 +54,11 @@ const Todo = memo(({ todo }: TodoProps) => {
 		const trimmedDescription = editDescription.trim()
 		const notUpdatedTodo = trimmedTitle === todo.title && trimmedDescription === todo.description && todo.completed
 		if (notUpdatedTodo) {
-			setEditing(false)
+			setNotEdit()
 			return
 		}
 		handleEditCard({ id, todoEdit: { title: trimmedTitle, description: trimmedDescription } })
-		setEditing(false)
-	}
-
-	const handleEdit = () => {
-		setEditing(true)
+		setNotEdit()
 	}
 
 	const handleSetTitle = (event: { target: { value: SetStateAction<string> } }) => {
@@ -110,7 +107,7 @@ const Todo = memo(({ todo }: TodoProps) => {
 				) : (
 					<Stack display={'flex'} direction={'column'} spacing={1}>
 						<Typography
-							onDoubleClick={isEditing ? undefined : handleEdit}
+							onDoubleClick={isEditing ? undefined : setEdit}
 							gutterBottom
 							sx={{
 								color: 'text.secondary',
@@ -124,7 +121,7 @@ const Todo = memo(({ todo }: TodoProps) => {
 							{todo.title}
 						</Typography>
 						<Typography
-							onDoubleClick={isEditing ? undefined : handleEdit}
+							onDoubleClick={isEditing ? undefined : setEdit}
 							variant="body2"
 							sx={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 4, overflow: 'hidden' }}
 						>
