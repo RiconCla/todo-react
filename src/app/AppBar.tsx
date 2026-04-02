@@ -184,13 +184,40 @@ const ButtonAppBar = ({ username }: Props) => {
 					<Stack direction={'row'} spacing={2} style={{ flexGrow: 1 }}>
 						{username && (
 							<Stack direction={'row'} spacing={2}>
-								<Typography variant="h6" component="div">
+								<Typography
+									variant="h6"
+									component="div"
+									sx={{
+										minWidth: 50,
+										whiteSpace: 'nowrap',
+										overflow: 'hidden',
+										textOverflow: 'ellipsis',
+									}}
+								>
 									Incomplete{': ' + unDoneCount}
 								</Typography>
-								<Typography variant="h6" component="div">
+								<Typography
+									variant="h6"
+									component="div"
+									sx={{
+										minWidth: 50,
+										whiteSpace: 'nowrap',
+										overflow: 'hidden',
+										textOverflow: 'ellipsis',
+									}}
+								>
 									Completed{': ' + doneCount}
 								</Typography>
-								<Typography variant="h6" component="div">
+								<Typography
+									variant="h6"
+									component="div"
+									sx={{
+										minWidth: 50,
+										whiteSpace: 'nowrap',
+										overflow: 'hidden',
+										textOverflow: 'ellipsis',
+									}}
+								>
 									<NavLink to={isAboutPage ? '/' : '/about'}>
 										{({ isActive }) => (
 											<span className={isActive ? 'active' : ''}>{isAboutPage ? 'Home' : 'About'}</span>

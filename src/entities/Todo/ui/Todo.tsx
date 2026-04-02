@@ -19,15 +19,20 @@ import { NavLink } from 'react-router'
 import LaunchIcon from '@mui/icons-material/Launch'
 import useEnqueueSnackbar from '../lib/useEnqueueSnackbar.tsx'
 import useToggleEdit from '../lib/useToggleEdit.tsx'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 type TodoProps = {
 	todo: TodoType
+	id?: string
+	index?: number
 }
 
 const Todo = memo(({ todo }: TodoProps) => {
 	const [isEditing, setEdit, setNotEdit] = useToggleEdit()
 	const [editTitle, setEditTitle] = useState<string>(todo.title)
 	const [editDescription, setEditDescription] = useState<string>(todo.description)
+	const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({ id: todo._id })
 
 	const [handleToggleComplete, { isLoading, isError: isErrorComplete, isSuccess: isSuccessComplete }] =
 		usePatchTodoMutation()
@@ -89,6 +94,15 @@ const Todo = memo(({ todo }: TodoProps) => {
 				position: 'relative',
 				overflow: 'hidden',
 			}}
+			ref={setNodeRef}
+			style={{
+				transform: CSS.Transform.toString(transform),
+				transition,
+				opacity: isDragging ? 0.5 : 1,
+				borderColor: isDragging ? 'pink' : undefined,
+			}}
+			{...attributes}
+			{...listeners}
 		>
 			<Backdrop
 				sx={{ color: '#fff', position: 'absolute', zIndex: (theme) => theme.zIndex.drawer + 1 }}
