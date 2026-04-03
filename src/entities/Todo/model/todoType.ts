@@ -14,6 +14,7 @@ export type EditTodoType = {
 	title?: string
 	description?: string
 	completed?: boolean
+	order?: number
 }
 
 export type TodoId = Pick<TodoType, '_id'>

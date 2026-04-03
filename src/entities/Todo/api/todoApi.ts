@@ -31,9 +31,9 @@ export const todoApiRTK = rtkApi.injectEndpoints({
 				const queryParams = getQueryParams(filters)
 				return `/todos${queryParams}`
 			},
-			transformResponse: (baseQueryReturnValue: TodoType[]): TodoType[] => {
-				return [...baseQueryReturnValue].reverse()
-			},
+			// transformResponse: (baseQueryReturnValue: TodoType[]): TodoType[] => {
+			// 	return [...baseQueryReturnValue].reverse()
+			// },
 			providesTags: ['Todos'],
 		}),
 		addTodo: builder.mutation<TodoType, CreateTodoType>({

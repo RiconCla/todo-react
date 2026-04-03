@@ -18,15 +18,21 @@ import { useDeleteTodoMutation, usePatchTodoMutation } from '../api/todoApi.ts'
 import { NavLink } from 'react-router'
 import LaunchIcon from '@mui/icons-material/Launch'
 import useEnqueueSnackbar from '../lib/useEnqueueSnackbar.tsx'
+import useToggleEdit from '../lib/useToggleEdit.tsx'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 type TodoProps = {
 	todo: TodoType
+	id?: string
+	index?: number
 }
 
 const Todo = memo(({ todo }: TodoProps) => {
-	const [isEditing, setEditing] = useState<boolean>(false)
+	const [isEditing, setEdit, setNotEdit] = useToggleEdit()
 	const [editTitle, setEditTitle] = useState<string>(todo.title)
 	const [editDescription, setEditDescription] = useState<string>(todo.description)
+	const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({ id: todo._id })
 
 	const [handleToggleComplete, { isLoading, isError: isErrorComplete, isSuccess: isSuccessComplete }] =
 		usePatchTodoMutation()
@@ -53,15 +59,11 @@ const Todo = memo(({ todo }: TodoProps) => {
 		const trimmedDescription = editDescription.trim()
 		const notUpdatedTodo = trimmedTitle === todo.title && trimmedDescription === todo.description && todo.completed
 		if (notUpdatedTodo) {
-			setEditing(false)
+			setNotEdit()
 			return
 		}
 		handleEditCard({ id, todoEdit: { title: trimmedTitle, description: trimmedDescription } })
-		setEditing(false)
-	}
-
-	const handleEdit = () => {
-		setEditing(true)
+		setNotEdit()
 	}
 
 	const handleSetTitle = (event: { target: { value: SetStateAction<string> } }) => {
@@ -92,6 +94,15 @@ const Todo = memo(({ todo }: TodoProps) => {
 				position: 'relative',
 				overflow: 'hidden',
 			}}
+			ref={setNodeRef}
+			style={{
+				transform: CSS.Transform.toString(transform),
+				transition,
+				opacity: isDragging ? 0.5 : 1,
+				borderColor: isDragging ? 'pink' : undefined,
+			}}
+			{...attributes}
+			{...listeners}
 		>
 			<Backdrop
 				sx={{ color: '#fff', position: 'absolute', zIndex: (theme) => theme.zIndex.drawer + 1 }}
@@ -110,7 +121,7 @@ const Todo = memo(({ todo }: TodoProps) => {
 				) : (
 					<Stack display={'flex'} direction={'column'} spacing={1}>
 						<Typography
-							onDoubleClick={isEditing ? undefined : handleEdit}
+							onDoubleClick={isEditing ? undefined : setEdit}
 							gutterBottom
 							sx={{
 								color: 'text.secondary',
@@ -124,7 +135,7 @@ const Todo = memo(({ todo }: TodoProps) => {
 							{todo.title}
 						</Typography>
 						<Typography
-							onDoubleClick={isEditing ? undefined : handleEdit}
+							onDoubleClick={isEditing ? undefined : setEdit}
 							variant="body2"
 							sx={{ display: '-webkit-box', WebkitBoxOrient: 'vertical', WebkitLineClamp: 4, overflow: 'hidden' }}
 						>
